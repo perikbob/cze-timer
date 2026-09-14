@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uren – installeren en gebruiken</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F7F6; --surface:#fff; --tint:#EAF0EE; --ink:#17262A; --ink2:#5F6F72; --line:#DCE4E2; --line-strong:#C4D0CC;
+  --accent:#0F6E5C; --accent-soft:#E2F0EB; --android:#3E8B45; --iphone:#2F6BB0; --warn-bg:#FBF1E6; --warn:#8A4B12;
+  --font:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:0 20px 64px}
+header{padding:40px 0 8px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--ink2);font-size:14px;font-weight:500}
+.mark{width:28px;height:28px;border-radius:8px;background:var(--accent);position:relative;flex:none}
+.mark::before,.mark::after,.mark span{content:'';position:absolute;left:7px;height:3px;border-radius:2px;background:#fff}
+.mark::before{top:8px;width:14px}.mark::after{top:13px;width:10px;opacity:.75}.mark span{top:18px;width:6px;opacity:.5}
+h1{margin:10px 0 6px;font-size:32px;line-height:1.15;letter-spacing:-.02em;font-weight:700}
+.lede{margin:0;color:var(--ink2);font-size:17px}
+h2{font-size:22px;letter-spacing:-.01em;margin:40px 0 12px;line-height:1.2}
+h3{font-size:16px;margin:0 0 4px}
+p{margin:0 0 12px}
+a{color:var(--accent)}
+b{font-weight:600}
+kbd{font:inherit;font-weight:600;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:1px 7px;white-space:nowrap}
+
+/* platform picker */
+.pick{margin:28px 0 8px;padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.pick p{margin:0 0 12px;font-weight:600}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg button{font:inherit;font-size:17px;font-weight:600;padding:16px 12px;border-radius:12px;border:2px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.seg button svg{width:22px;height:22px}
+.seg button[data-p="android"].is-on{border-color:var(--android);background:#EAF3EA;color:#2B6A31}
+.seg button[data-p="iphone"].is-on{border-color:var(--iphone);background:#E8EFF8;color:#25548C}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* steps */
+.steps{list-style:none;margin:0;padding:0;counter-reset:step}
+.steps li{position:relative;display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:0}
+.num{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff}
+.android .num{background:var(--android)}.iphone .num{background:var(--iphone)}
+.step-body{flex:1;min-width:0}
+.step-body p:last-child{margin:0}
+.check{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:#0B5A4B;font-size:14px}
+.check b{color:inherit}
+.warn{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--warn-bg);color:var(--warn);font-size:14px}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--tint);color:var(--ink2);font-size:13px;font-weight:600;margin-left:6px;vertical-align:middle}
+
+/* app link */
+.applink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:10px 0 4px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+.btn:hover{background:#0B5A4B}
+code.url{font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;word-break:break-all}
+
+/* generic sections */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:0 0 12px}
+.card h3{margin-bottom:6px}
+.card p:last-child{margin:0}
+.two{display:grid;gap:12px}
+@media (min-width:600px){.two{grid-template-columns:1fr 1fr}}
+.faq dt{font-weight:600;margin-top:14px}
+.faq dd{margin:2px 0 0;color:var(--ink2)}
+footer{margin-top:48px;color:var(--ink2);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+[hidden]{display:none!important}
+@media print{body{background:#fff}.pick{display:none}.wrap{max-width:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><span class="mark"><span></span></span>Uren</div>
+  <h1>Uren installeren en gebruiken</h1>
+  <p class="lede">In vijf minuten staat Uren als app op je telefoon. Daarna boek je uren met twee tikken, ook zonder internet.</p>
+</header>
+
+<div class="pick">
+  <p>Welke telefoon heb je?</p>
+  <div class="seg" role="tablist" aria-label="Telefoon">
+    <button type="button" data-p="android" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/></svg>Android
+    </button>
+    <button type="button" data-p="iphone" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M9 5h6"/></svg>iPhone
+    </button>
+  </div>
+</div>
+
+<!-- ================= ANDROID ================= -->
+<section id="android" class="android" hidden>
+  <h2>Installeren op Android</h2>
+  <ol class="steps">
+    <li>
+      <span class="num">1</span>
+      <div class="step-body">
+        <h3>Open Uren in Chrome</h3>
+        <p>Gebruik de link hieronder (of typ het adres over). Open hem in <b>Chrome</b>, niet in een andere browser.</p>
+        <div class="applink"><a class="btn app-href" href="#">Open Uren</a><code class="url app-url"></code></div>
+      </div>
+    </li>
+    <li>
+      <span class="num">2</span>
+      <div class="step-body">
+        <h3>Installeer de app</h3>
+        <p>Bovenaan staat een balk <i>Uren is nog niet geïnstalleerd als app</i>. Tik op <kbd>Installeren</kbd> en bevestig. Zie je die knop niet, tik dan rechtsboven op <kbd>⋮</kbd> en kies <kbd>App installeren</kbd> of <kbd>Toevoegen aan startscherm</kbd>.</p>
+        <p>Sluit Chrome en open <b>Uren vanaf je startscherm</b>. Vanaf nu gebruik je altijd dat icoon.</p>
+      </div>
+    </li>
+    <li>
+      <span class="num">3</span>
+      <div class="step-body">
+        <h3>Maak het urenbestand aan <span class="pill">eenmalig</span></h3>
+        <p>De app bewaart al je uren in één bestand op je telefoon. Bovenaan staat <i>Maak het urenbestand aan</i>: tik op <kbd>Bestand aanmaken</kbd>, kies de map <b>Downloads</b>, laat de naam <b>uren.json</b> staan en tik op <kbd>Opslaan</kbd>.</p>
+        <p>Bij je eerste boeking kan Chrome één keer vragen of Uren het bestand mag bewerken. Kies <kbd>Toestaan</kbd>. Daarna hoor je er nooit meer iets van: het bestand wordt bij elke boeking vanzelf bijgewerkt.</p>
+        <div class="check"><b>Controle:</b> tik op <kbd>Types</kbd> en kijk onder <i>Gegevens en opslag</i>. Er staat <i>Als app geïnstalleerd: Ja</i> en <i>Urenbestand: uren.json, bijgewerkt bij elke boeking</i>.</div>
+      </div>
+    </li>
+    <li>
+      <span class="num">4</span>
+      <div class="step-body">
+        <h3>Klaar</h3>
+        <p>Je hoeft verder niets te doen om je uren veilig te houden. Verwijder je de app per ongeluk, of krijg je een nieuwe telefoon? Installeer Uren opnieuw en tik in de balk op <kbd>Bestaand bestand kiezen</kbd>, kies <b>uren.json</b> in Downloads en alles staat er weer.</p>
+        <div class="warn">Gooi <b>uren.json</b> in Downloads niet weg. Dat is je urenregistratie.</div>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ================= IPHONE ================= -->
+<section id="iphone" class="iphone" hidden>
+  <h2>Installeren op iPhone</h2>
+  <ol class="steps">
+    <li>
+      <span class="num">1</span>
+      <div class="step-body">
+        <h3>Open Uren in Safari</h3>
+        <p>Gebruik de link hieronder (of typ het adres over). Open hem in <b>Safari</b>, niet in Chrome of een andere browser; alleen Safari kan de app op je beginscherm zetten.</p>
+        <div class="applink"><a class="btn app-href" href="#">Open Uren</a><code class="url app-url"></code></div>
+      </div>
+    </li>
+    <li>
+      <span class="num">2</span>
+      <div class="step-body">
+        <h3>Zet Uren op je beginscherm <span class="pill">vóór je gaat boeken</span></h3>
+        <p>Tik onderaan op <kbd>Delen</kbd> (het vierkantje met de pijl omhoog), scrol omlaag en kies <kbd>Zet op beginscherm</kbd>, dan <kbd>Voeg toe</kbd>.</p>
+        <p>Sluit Safari en open <b>Uren vanaf je beginscherm</b>. Vanaf nu gebruik je altijd dat icoon. Wat je in Safari boekt, komt niet in de app terecht.</p>
+        <div class="check"><b>Controle:</b> tik op <kbd>Types</kbd> en kijk onder <i>Gegevens en opslag</i>. Er staat <i>Als app geïnstalleerd: Ja</i>.</div>
+      </div>
+    </li>
+    <li>
+      <span class="num">3</span>
+      <div class="step-body">
+        <h3>Lees de melding en tik op Begrepen</h3>
+        <p>Op een iPhone staan je uren in de app zelf. Een iPhone laat de app geen bestand bijhouden, dus zet jij zelf af en toe een kopie in Bestanden. Hoe, staat in de volgende stap.</p>
+      </div>
+    </li>
+    <li>
+      <span class="num">4</span>
+      <div class="step-body">
+        <h3>Elke werkdag één tik: Bewaar naar bestand <span class="pill">belangrijk</span></h3>
+        <p>Onder het boekpaneel staat <i>3 boekingen nog niet in een bestand</i> met de knop <kbd>Bewaar naar bestand</kbd>. Tik daarop, kies <kbd>Bewaar in Bestanden</kbd>, kies een map (bijvoorbeeld <b>iCloud Drive</b> of <b>Op mijn iPhone</b>) en tik op <kbd>Bewaar</kbd>. Klaar tot morgen.</p>
+        <p>Vergeet je het een dag, dan wordt die regel rood. Het bestand heet <b>uren-datum.json</b>; elke keer komt er een nieuwe bij en de nieuwste is altijd compleet, dus oudere mag je weggooien.</p>
+        <div class="warn">Verwijder je de app zonder dat je ooit hebt bewaard, dan zijn de uren weg. Die ene tik per dag is je verzekering.</div>
+      </div>
+    </li>
+    <li>
+      <span class="num">5</span>
+      <div class="step-body">
+        <h3>Nieuwe telefoon of app verwijderd?</h3>
+        <p>Installeer Uren opnieuw (stap 1 en 2), tik op <kbd>Types</kbd> → <kbd>Bestand terugzetten</kbd> en kies je <b>nieuwste</b> uren-bestand. Alles staat er weer.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ================= GEBRUIK ================= -->
+<section id="gebruik" hidden>
+  <h2>Zo boek je uren</h2>
+  <div class="two">
+    <div class="card">
+      <h3>Handmatig</h3>
+      <p>Tik een <b>type</b> aan (veeg door de rijtjes voor meer), kies <b>15, 30, 45 of 60 minuten</b> of stel bij met <kbd>−</kbd> en <kbd>+</kbd>, tik op <kbd>Boeken</kbd>. De balk bovenaan vult zich per type.</p>
+    </div>
+    <div class="card">
+      <h3>Met de timer</h3>
+      <p>Tik op de <b>ronde knop</b> bovenin het boekpaneel om te starten. Kies het type vooraf, tussendoor of bij het stoppen. Stoppen rondt af op kwartieren en boekt meteen. De timer loopt door als je de app sluit.</p>
+    </div>
+    <div class="card">
+      <h3>Wijzigen of verwijderen</h3>
+      <p>Tik op een boeking in de lijst. Het paneel springt naar <i>Boeking bewerken</i>; pas aan en tik op <kbd>Opslaan</kbd>, of tik twee keer op <kbd>Verwijderen</kbd>.</p>
+    </div>
+    <div class="card">
+      <h3>Andere dag</h3>
+      <p>Gebruik de pijltjes naast de datum of tik op de datum voor een kalender. Vergeten uren van gisteren boek je gewoon op gisteren. <kbd>Naar vandaag</kbd> brengt je terug.</p>
+    </div>
+    <div class="card">
+      <h3>Overzicht</h3>
+      <p>Onder <kbd>Lijst</kbd> zie je 7, 30 of 90 dagen, met totalen per type en een filter. Tik op een dag om die te openen.</p>
+    </div>
+    <div class="card">
+      <h3>Aan het eind van de proef</h3>
+      <p>Ga naar <kbd>Lijst</kbd>, kies <i>Eigen periode</i> over de hele proef en tik op <kbd>Exporteer als CSV</kbd>. Deel het bestand met de projectleider.</p>
+    </div>
+  </div>
+
+  <h2>Veelgestelde vragen</h2>
+  <dl class="faq">
+    <dt>Werkt het zonder internet?</dt>
+    <dd>Ja. Na installatie heeft de app geen verbinding nodig.</dd>
+    <dt>Waar staan mijn gegevens?</dt>
+    <dd>Alleen op je eigen telefoon. Er gaat niets naar een server. Daarom is het bestand (Android) of de dagelijkse kopie (iPhone) zo belangrijk.</dd>
+    <dt>Ik zie “Nieuwe versie klaar”.</dt>
+    <dd>Sluit de app helemaal en open hem opnieuw. Je uren blijven staan.</dd>
+    <dt>Kan ik types toevoegen of hernoemen?</dt>
+    <dd>Ja, onder <kbd>Types</kbd>. Archiveren verbergt een type bij het boeken; bestaande uren blijven staan.</dd>
+    <dt>Hoe zet ik minuten om naar uren?</dt>
+    <dd>De app toont uren:minuten (1:30). De CSV-export bevat ook een kolom met decimale uren (1,50).</dd>
+  </dl>
+
+  <footer>Vragen of problemen? Neem contact op met de projectleider van de proef.</footer>
+</section>
+
+<script>
+(() => {
+  // Adres van de app. Staat deze handleiding in dezelfde map als de app (index.html), dan wordt
+  // het adres automatisch afgeleid. Anders: vul het hieronder in.
+  const FALLBACK_URL = 'https://JOUW-ADRES.github.io/uren/';
+  const here = location.href;
+  const appUrl = /^https?:/.test(here) ? here.replace(/[^/]*(\?.*)?(#.*)?$/, '') : FALLBACK_URL;
+  document.querySelectorAll('.app-url').forEach(el => { el.textContent = appUrl; });
+  document.querySelectorAll('.app-href').forEach(a => { a.href = appUrl; });
+
+  const sections = { android: document.getElementById('android'), iphone: document.getElementById('iphone') };
+  const gebruik = document.getElementById('gebruik');
+  const buttons = [...document.querySelectorAll('.seg button')];
+  function show(p, push) {
+    for (const k in sections) sections[k].hidden = k !== p;
+    gebruik.hidden = false;
+    buttons.forEach(b => { const on = b.dataset.p === p; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
+    if (push) { try { history.replaceState(null, '', '#' + p); } catch (e) {} }
+  }
+  buttons.forEach(b => b.addEventListener('click', () => { show(b.dataset.p, true); sections[b.dataset.p].scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  const fromHash = location.hash.replace('#', '');
+  const ua = navigator.userAgent;
+  const guess = /iPhone|iPad|iPod/.test(ua) ? 'iphone' : /Android/i.test(ua) ? 'android' : null;
+  const pick = sections[fromHash] ? fromHash : guess;
+  if (pick) show(pick, false);
+})();
+</script>
+</div>
+</body>
+</html>

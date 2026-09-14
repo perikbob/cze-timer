@@ -23,6 +23,11 @@ Deel daarna het adres van `index.html`.
 - **iPhone/iPad**: open het adres in Safari → Delen → *Zet op beginscherm*. Doe dit vóór je gaat boeken: de app op het beginscherm heeft eigen opslag, wat je in Safari boekt komt daar niet in (of: backup maken in Safari, terugzetten in de app).
 - **Android**: Chrome biedt *Installeren* / *Toevoegen aan startscherm* aan, of gebruik de knop onder Types → Gegevens en opslag.
 
+## Boeken en timer
+
+- Handmatig: type kiezen, tijd via 15/30/45/60 of − en +, Boeken. Er is geen standaardtype: elke boeking is een bewuste keuze.
+- Timer: de ronde knop bovenin het boekpaneel. Type eerst kiezen en dan starten, of starten en het type bij het stoppen kiezen (of tussendoor aantikken). Stoppen rondt af op het dichtstbijzijnde kwartier, minimaal 0:15, en boekt direct als er een type gekozen is. De timer loopt door als de app gesloten wordt.
+
 ## 3. Waar de uren staan
 
 - Op het toestel zelf, niet op een server. Twee kopieën: localStorage en een IndexedDB-spiegel; bij het starten wint de nieuwste, dus het wegvallen van één kopie kost geen uren.

@@ -79,6 +79,16 @@ h2,h3{line-height:1.25}
 .panel h2{margin:0 0 12px;font-size:16px;font-weight:600}
 .panel p{margin:0 0 12px;color:var(--ink2);font-size:14px}
 .booking{margin:14px 0 6px;padding:14px 16px 14px}
+.timer{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:0 0 12px;border-bottom:1px solid rgba(23,38,42,.08)}
+.recbtn{width:52px;height:52px;flex:none;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);display:grid;place-items:center}
+.recbtn:hover{border-color:var(--danger)}
+.rec-mark{width:20px;height:20px;border-radius:50%;background:var(--danger);transition:border-radius .15s,width .15s,height .15s}
+.recbtn.is-running{background:var(--danger);border-color:var(--danger)}
+.recbtn.is-running .rec-mark{background:#fff;border-radius:3px;width:16px;height:16px}
+.timer-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.timer-time{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.timer.is-running .timer-time{font-size:26px}
+.timer-sub{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .booking h2{margin-bottom:10px}
 .listhead{margin:22px 0 2px;font-size:14px;font-weight:600;color:var(--ink2)}
 .strip{position:relative;margin:0 -16px}
@@ -220,6 +230,13 @@ h2,h3{line-height:1.25}
 
     <section class="panel booking" id="booking" aria-label="Uren boeken">
       <h2 id="bookingTitle" hidden>Boeking bewerken</h2>
+      <div class="timer" id="timerRow">
+        <button type="button" class="recbtn" id="recBtn" aria-label="Timer starten"><span class="rec-mark"></span></button>
+        <div class="timer-main">
+          <div class="timer-time" id="timerTime">Timer</div>
+          <div class="timer-sub" id="timerSub"></div>
+        </div>
+      </div>
       <div class="strip" id="typeStrip"><div class="chips" id="typeChips" role="radiogroup" aria-label="Type"></div></div>
       <div class="presets" id="presets" role="group" aria-label="Snelle tijd"></div>
       <div class="stepper">
@@ -227,7 +244,6 @@ h2,h3{line-height:1.25}
         <div class="duration" id="durationOut" role="status" aria-live="polite">1:00</div>
         <button type="button" class="stepbtn" id="plus" aria-label="15 minuten meer">+</button>
       </div>
-      <input class="text" id="noteInput" placeholder="Notitie (optioneel)" maxlength="140" autocomplete="off">
       <div class="actions">
         <button type="button" class="primary" id="saveBtn">Boeken</button>
         <button type="button" class="ghost" id="cancelEdit" hidden>Annuleren</button>
@@ -528,9 +544,7 @@ h2,h3{line-height:1.25}
     return state.types.filter(t => m.has(t.id)).map(t => ({ type: t, minutes: m.get(t.id) }));
   }
   function resetDraft() {
-    const act = activeTypes();
-    const keep = ui.draft.typeId && act.some(t => t.id === ui.draft.typeId);
-    ui.draft = { typeId: keep ? ui.draft.typeId : (act[0] ? act[0].id : null), minutes: ui.draft.minutes || 60, note: '' };
+    ui.draft = { typeId: null, minutes: ui.draft.minutes || 60, note: '' };
   }
 
   // ---------- render ----------
@@ -581,7 +595,7 @@ h2,h3{line-height:1.25}
       : `<p class="hint">Nog geen types. Maak er eerst een aan onder <button type="button" class="linkbtn" data-goto="types">Types</button>.</p>`;
     syncDuration();
     revealSelectedChip();
-    $('#noteInput').value = ui.draft.note;
+    renderTimer();
     $('#saveBtn').textContent = editing ? 'Opslaan' : 'Boeken';
     $('#cancelEdit').hidden = !editing;
     const del = $('#deleteBtn');
@@ -677,7 +691,7 @@ h2,h3{line-height:1.25}
     $('#storageStatus').innerHTML =
       `<dt>Als app geïnstalleerd</dt>${standalone ? '<dd>Ja</dd>' : '<dd class="warn">Nee</dd>'}` +
       `<dt>Opslag beschermd</dt>${persisted}` +
-      `<dt>Urenbestand</dt>${!fsaAvailable() ? '<dd>Niet mogelijk in deze browser; gebruik Bewaar naar bestand</dd>' : !fileHandle ? '<dd class="warn">Nog niet aangemaakt</dd>' : fileError ? `<dd class="warn">${esc(linkedName())}, schrijven mislukt</dd>` : `<dd>${esc(linkedName())}, bijgewerkt bij elke boeking</dd>`}` +
+      `<dt>Urenbestand</dt>${!fsaAvailable() ? (isIOS ? '<dd>Niet mogelijk op iPhone; gebruik Bewaar naar bestand</dd>' : '<dd>Niet mogelijk in deze browser; gebruik Bewaar naar bestand</dd>') : !fileHandle ? '<dd class="warn">Nog niet aangemaakt</dd>' : fileError ? `<dd class="warn">${esc(linkedName())}, schrijven mislukt</dd>` : `<dd>${esc(linkedName())}, bijgewerkt bij elke boeking</dd>`}` +
       `<dt>In bestand</dt>${unsavedCount() && !fileBusy ? `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>` : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
       `<dt>Laatste keer</dt><dd>${state.fileSavedAt ? agoText(state.fileSavedAt) : 'Nog geen'}</dd>` +
       `<dt>Omvang</dt><dd>${plural(state.entries.length, 'boeking', 'boekingen')}, ${kb} kB</dd>`;
@@ -708,9 +722,10 @@ h2,h3{line-height:1.25}
     const fsa = fsaAvailable(); let title = '', body = '', actions = '', err = false;
     if (isHttp && !isStandalone() && !ui.bannerDismissed) {
       title = 'Uren is nog niet geïnstalleerd als app';
-      body = fsa ? 'Installeer de app en maak daarna één keer het urenbestand aan op dit toestel. Dat bestand wordt bij elke boeking bijgewerkt en blijft staan als de app ooit verwijderd wordt.'
-        : isIOS ? 'Installeer via Delen → Zet op beginscherm, vóór je gaat boeken.' : 'Installeer via het menu van de browser (App installeren).';
-      actions = (installPrompt ? '<button type="button" class="primary small" id="installBtn">Installeren</button>' : '<button type="button" class="ghost small" data-goto="types">Hoe?</button>') +
+      if (isIOS) body = 'Tik in Safari op Delen en kies “Zet op beginscherm”. Doe dit vóór je gaat boeken: de app op het beginscherm heeft eigen opslag.';
+      else if (fsa) body = 'Installeer de app en maak daarna één keer het urenbestand aan op dit toestel. Dat bestand wordt bij elke boeking bijgewerkt en blijft staan als de app ooit verwijderd wordt.';
+      else body = 'Installeer via het menu van de browser (App installeren).';
+      actions = (installPrompt ? '<button type="button" class="primary small" id="installBtn">Installeren</button>' : isIOS ? '' : '<button type="button" class="ghost small" data-goto="types">Hoe?</button>') +
         '<button type="button" class="linkbtn" data-banner-dismiss>Later</button>';
     } else if (fsa && !fileHandle) {
       title = 'Maak het urenbestand aan';
@@ -721,6 +736,10 @@ h2,h3{line-height:1.25}
       title = fileError === 'permission' ? `Geen toestemming voor ${linkedName()}` : `Kan niet schrijven naar ${linkedName()}`;
       body = `${plural(unsavedCount(), 'boeking staat', 'boekingen staan')} nog niet in het bestand. ${fileError === 'permission' ? 'Tik op Opnieuw en sta het bewerken toe.' : 'Bestaat het bestand nog? Koppel anders een ander bestand.'}`;
       actions = '<button type="button" class="primary small" data-file-action="retry">Opnieuw</button><button type="button" class="ghost small" data-file-action="pick">Ander bestand</button>';
+    } else if (!fsa && isIOS && !state.iosNoticeSeen) {
+      title = 'Zo bewaart Uren je uren op een iPhone';
+      body = 'Je uren staan in de app zelf. Een iPhone laat de app geen bestand bijhouden, dus zet zelf regelmatig een kopie in Bestanden met Bewaar naar bestand, bijvoorbeeld aan het eind van elke werkdag. De app telt wat nog niet bewaard is en herinnert je eraan.';
+      actions = '<button type="button" class="primary small" data-banner-seen>Begrepen</button>';
     } else { b.hidden = true; return; }
     b.hidden = false; b.classList.toggle('is-error', err);
     $('#bannerTitle').textContent = title; $('#bannerBody').textContent = body; $('#bannerActions').innerHTML = actions;
@@ -753,20 +772,20 @@ h2,h3{line-height:1.25}
   function cancelEdit() { ui.editingId = null; ui.confirmDelete = false; resetDraft(); renderDay(); }
 
   function saveEntry() {
-    const note = $('#noteInput').value.trim(), d = ui.draft;
+    const d = ui.draft;
     if (!d.typeId) { toast('Kies eerst een type.'); return; }
     if (ui.editingId) {
       const e = state.entries.find(x => x.id === ui.editingId);
-      if (e) { e.typeId = d.typeId; e.minutes = d.minutes; e.note = note; }
+      if (e) { e.typeId = d.typeId; e.minutes = d.minutes; }
       ui.editingId = null; markChanged();
       save(); toast('Boeking opgeslagen');
     } else {
-      state.entries.push({ id: uid(), date: ui.date, typeId: d.typeId, minutes: d.minutes, note, created: Date.now() });
+      state.entries.push({ id: uid(), date: ui.date, typeId: d.typeId, minutes: d.minutes, note: '', created: Date.now() });
       markChanged();
       save();
       toast(`${fmtMin(d.minutes)} geboekt op ${(typeById(d.typeId) || UNKNOWN).name}`);
     }
-    ui.confirmDelete = false; ui.draft.note = '';
+    ui.confirmDelete = false; ui.draft.typeId = null;
     renderDay();
   }
   function deleteEntry() {
@@ -779,6 +798,55 @@ h2,h3{line-height:1.25}
   }
 
   const PRESETS = [15, 30, 45, 60];
+  // ---------- timer ----------
+  // One running timer, kept in state so it survives closing the app. Stop rounds to the nearest
+  // quarter (minimum 0:15). With a type chosen it books at once; without, it fills in the duration
+  // and waits for a type.
+  const roundQuarter = ms => Math.max(STEP, Math.round(ms / 60000 / STEP) * STEP);
+  const fmtElapsed = ms => { const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60; return (h ? h + ':' + pad(m) : String(m)) + ':' + pad(s % 60); };
+  let timerTick = null;
+  function startTimer() {
+    const typeId = ui.draft.typeId && activeTypes().some(t => t.id === ui.draft.typeId) ? ui.draft.typeId : null;
+    state.timer = { startedAt: Date.now(), typeId, date: today() };
+    persist(); renderTimer();
+  }
+  function stopTimer() {
+    const t = state.timer; if (!t) return;
+    const minutes = roundQuarter(Date.now() - t.startedAt);
+    const ty = t.typeId && typeById(t.typeId);
+    state.timer = null;
+    if (ty) {
+      state.entries.push({ id: uid(), date: t.date, typeId: ty.id, minutes, note: '', created: Date.now() });
+      markChanged(); save();
+      if (ui.date !== t.date) { ui.date = t.date; ui.editingId = null; }
+      ui.draft.typeId = null; renderDay();
+      toast(`${fmtMin(minutes)} geboekt op ${ty.name}`);
+    } else {
+      ui.editingId = null; ui.confirmDelete = false; ui.draft.minutes = minutes;
+      persist(); renderDay();
+      toast(`Timer gestopt op ${fmtMin(minutes)}. Kies een type en tik op Boeken.`, 4000);
+    }
+  }
+  function timerTickFn() {
+    const t = state.timer; if (!t) return;
+    const ms = Date.now() - t.startedAt, ty = t.typeId && typeById(t.typeId);
+    $('#timerTime').textContent = fmtElapsed(ms);
+    $('#timerSub').textContent = `wordt ${fmtMin(roundQuarter(ms))}, ${ty ? ty.name : 'kies nog een type'}`;
+  }
+  function renderTimer() {
+    const running = !!state.timer, row = $('#timerRow'), btn = $('#recBtn');
+    row.classList.toggle('is-running', running);
+    btn.classList.toggle('is-running', running);
+    btn.setAttribute('aria-label', running ? 'Timer stoppen' : 'Timer starten');
+    if (!running) {
+      clearInterval(timerTick); timerTick = null;
+      $('#timerTime').textContent = 'Timer';
+      $('#timerSub').textContent = 'Kies een type en start, of kies het type bij het stoppen.';
+      return;
+    }
+    timerTickFn();
+    if (!timerTick) timerTick = setInterval(timerTickFn, 1000);
+  }
   function revealSelectedChip() {
     const strip = $('#typeChips'), sel = strip.querySelector('.chip.is-selected');
     if (sel && strip.clientWidth) {
@@ -872,12 +940,17 @@ h2,h3{line-height:1.25}
       if (d.fileAction === 'retry') { fileError = null; writeLinkedFile(); return renderBanner(); }
     }
     if ('bannerDismiss' in d) { ui.bannerDismissed = true; return renderBanner(); }
+    if ('bannerSeen' in d) { state.iosNoticeSeen = true; persist(); return renderBanner(); }
     if (d.edit) {
       const e = state.entries.find(x => x.id === d.edit); if (!e) return;
       if (ui.view !== 'day') { ui.date = e.date; setView('day'); }
       return startEdit(d.edit);
     }
-    if (d.type) { ui.draft.typeId = d.type; ui.confirmDelete = false; ui.draft.note = $('#noteInput').value; return renderBooking(); }
+    if (d.type) {
+      ui.draft.typeId = d.type; ui.confirmDelete = false;
+      if (state.timer) { state.timer.typeId = d.type; persist(); }
+      return renderBooking();
+    }
     if (d.preset) return setMinutes(Number(d.preset));
     if (d.filter) {
       if (d.filter === 'all') ui.typeFilter.clear();
@@ -912,11 +985,9 @@ h2,h3{line-height:1.25}
 
   document.addEventListener('input', ev => {
     if (ev.target.id === 'editTypeName') ui.editName = ev.target.value;
-    if (ev.target.id === 'noteInput') ui.draft.note = ev.target.value;
   });
   document.addEventListener('keydown', ev => {
     if (ev.key !== 'Enter') return;
-    if (ev.target.id === 'noteInput') { ev.preventDefault(); saveEntry(); }
     if (ev.target.id === 'newTypeName') { ev.preventDefault(); addType(); }
     if (ev.target.id === 'editTypeName') { ev.preventDefault(); const b = document.querySelector('[data-save-type]'); if (b) b.click(); }
   });
@@ -931,6 +1002,7 @@ h2,h3{line-height:1.25}
   picker.addEventListener('click', ev => { if (typeof picker.showPicker === 'function') { ev.preventDefault(); try { picker.showPicker(); } catch (e) {} } });
   holdable($('#minus'), -1); holdable($('#plus'), 1);
   $('#saveBtn').addEventListener('click', saveEntry);
+  $('#recBtn').addEventListener('click', () => { if (state.timer) stopTimer(); else startTimer(); });
   $('#cancelEdit').addEventListener('click', cancelEdit);
   $('#deleteBtn').addEventListener('click', deleteEntry);
   $('#fromDate').addEventListener('change', ev => { ui.from = ev.target.value; renderList(); });
@@ -981,7 +1053,7 @@ h2,h3{line-height:1.25}
     } catch (e) { toast('Dit bestand is geen geldige backup.'); }
     ev.target.value = '';
   });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && ui.view === 'day') renderDay(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { if (ui.view === 'day') renderDay(); else renderTimer(); } });
 
   // ---------- start ----------
   resetDraft();

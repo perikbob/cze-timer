@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F4F7F6">
+<title>Uren</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Uren">
+<style>
+@font-face{font-family:'Instrument Sans';src:url('./fonts/InstrumentSans.woff2') format('woff2');font-weight:400 700;font-style:normal;font-display:swap}
+</style>
+<style>
+:root{
+  --bg:#F4F7F6; --surface:#FFFFFF; --tint:#EAF0EE; --track:#E1E9E6;
+  --ink:#17262A; --ink2:#5F6F72; --line:#DCE4E2; --line-strong:#C4D0CC;
+  --accent:#0F6E5C; --accent-dark:#0B5A4B; --accent-soft:#E2F0EB;
+  --danger:#B0463E; --focus:#2F6BB0;
+  --font:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0;touch-action:manipulation}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+h2,h3{line-height:1.25}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+@media (min-width:720px){.wrap{padding:0 24px}}
+
+/* header */
+.top{position:sticky;top:0;z-index:5;background:rgba(244,247,246,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+.brand{font-weight:600;font-size:20px;letter-spacing:-.01em}
+.tabs{display:flex;background:#E4EBE8;border-radius:999px;padding:3px}
+.tab{padding:7px 16px;border-radius:999px;font-weight:500;color:var(--ink2)}
+.tab.is-active{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(23,38,42,.14)}
+
+/* day view */
+.daynav{display:flex;align-items:center;gap:8px;padding:20px 0 16px}
+.daycenter{flex:1;min-width:0;text-align:center}
+.daylabel{position:relative;display:block;cursor:pointer;border-radius:8px}
+#dayLabel{display:block;font-size:22px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+#dayPicker{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.daysub{display:flex;justify-content:center;align-items:center;gap:10px;min-height:24px;font-size:14px;color:var(--ink2)}
+.iconbtn{width:40px;height:40px;flex:none;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface);display:grid;place-items:center;color:var(--ink)}
+.iconbtn:hover{background:#EEF3F1}
+.linkbtn{color:var(--accent);font-weight:600;padding:2px 6px;border-radius:6px;font-size:14px}
+.linkbtn:hover{text-decoration:underline}
+
+.bar{display:flex;gap:2px;height:14px;border-radius:7px;background:var(--track);overflow:hidden}
+.bar .seg{height:100%;transition:width .4s cubic-bezier(.2,.7,.2,1)}
+.daymeta{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;min-height:32px}
+.daymeta .count{color:var(--ink2);font-size:14px}
+.daymeta .total{font-size:26px;font-weight:600;letter-spacing:-.01em}
+
+.entries{list-style:none;margin:6px 0 0;padding:0}
+.entries>li{border-bottom:1px solid var(--line)}
+.entries>li:last-child{border-bottom:0}
+.entry{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 8px 13px 6px;border-radius:10px;margin:1px 0}
+.entry:hover{background:#EEF3F1}
+.entry.is-editing{background:var(--accent-soft)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
+.entry-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.entry-type{font-weight:500}
+.entry-note{color:var(--ink2);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-dur{font-weight:600;font-size:17px}
+.empty{color:var(--ink2);margin:18px 0 0;font-size:15px}
+
+/* form panels */
+.panel{margin:24px 0;padding:18px 16px 16px;background:var(--tint);border-radius:16px}
+.panel h2{margin:0 0 12px;font-size:16px;font-weight:600}
+.panel p{margin:0 0 12px;color:var(--ink2);font-size:14px}
+.booking{margin-bottom:40px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;padding:2px}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:10px 16px;min-height:44px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);white-space:nowrap;font-weight:500;--c:var(--ink2)}
+.chip:hover{border-color:var(--c)}
+.chip .dot{background:var(--c)}
+.chip.is-selected{background:var(--c);border-color:var(--c);color:#fff}
+.chip.is-selected .dot{background:rgba(255,255,255,.75)}
+.chip-all{--c:var(--ink)}
+.presets{display:flex;gap:10px;margin-top:18px;padding:2px}
+.preset{flex:1;min-width:0;min-height:44px;padding:10px 6px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:600;white-space:nowrap}
+.preset:hover:not(.is-selected){background:#EEF3F1}
+.preset.is-selected{background:var(--ink);border-color:var(--ink);color:#fff}
+.stepper{display:flex;align-items:center;justify-content:center;gap:18px;padding:16px 0 12px}
+.stepbtn{width:52px;height:52px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);font-size:26px;line-height:1;display:grid;place-items:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.stepbtn:hover:not(:disabled){background:#EEF3F1}
+.stepbtn:disabled{opacity:.4}
+.duration{font-size:36px;font-weight:600;min-width:120px;text-align:center;letter-spacing:-.02em;line-height:1;user-select:none;-webkit-user-select:none}
+.text{width:100%;height:46px;padding:0 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface)}
+.text::placeholder{color:#8A9799}
+.actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.primary{background:var(--accent);color:#fff;font-weight:600;height:46px;padding:0 20px;border-radius:10px;flex:1}
+.primary:hover{background:var(--accent-dark)}
+.ghost{height:46px;padding:0 16px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:500}
+.ghost:hover:not(:disabled){background:#EEF3F1}
+.ghost:disabled{opacity:.5}
+.small{height:38px;padding:0 14px;font-size:14px}
+.danger-text{color:var(--danger)}
+#deleteBtn.is-armed{background:var(--danger);color:#fff;border-color:var(--danger)}
+.hint{color:var(--ink2);font-size:14px;margin:0}
+.hint .linkbtn{padding:0}
+
+/* list view */
+.filters{padding:18px 0 6px;display:flex;flex-direction:column;gap:12px}
+.seg{display:inline-flex;align-self:flex-start;max-width:100%;overflow-x:auto;background:#E4EBE8;border-radius:10px;padding:3px;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{padding:7px 12px;border-radius:8px;font-weight:500;color:var(--ink2);white-space:nowrap}
+.seg button.is-active{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(23,38,42,.14)}
+.range{display:flex;gap:12px;flex-wrap:wrap}
+.range label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)}
+.range input{height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface)}
+.summary{padding:12px 0 12px;border-bottom:1px solid var(--line)}
+.summary .bar{height:10px;border-radius:5px}
+.summary .daymeta{min-height:auto}
+.legend{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 24px;font-size:14px}
+.legend li{display:flex;align-items:center;gap:8px}
+.legend-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+.legend-val{font-weight:600}
+.group{padding-top:16px}
+.group-head{display:flex;justify-content:space-between;align-items:center;padding:0 0 2px}
+.group-head .open{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;color:var(--ink);padding:4px 6px;margin-left:-6px;border-radius:8px}
+.group-head .open:hover{background:#EEF3F1}
+.group-head .open svg{color:var(--ink2)}
+.group-total{font-weight:600;color:var(--ink2);font-size:14px}
+.list-foot{padding:20px 0 40px;display:flex;gap:10px}
+
+/* types view */
+.typelist{list-style:none;margin:0;padding:8px 0 0}
+.type-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.type-name{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.type-total{color:var(--ink2);font-size:14px}
+.type-edit{flex-direction:column;align-items:stretch;gap:12px;background:var(--tint);border-radius:14px;padding:14px;border-bottom:0;margin:6px 0}
+.type-edit .hint{margin-top:-2px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;padding:2px}
+.swatch{width:30px;height:30px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px rgba(23,38,42,.1)}
+.swatch.is-selected{border-color:#fff;box-shadow:0 0 0 2px var(--ink)}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap}
+.archived-head{margin:28px 0 0;font-size:14px;color:var(--ink2);font-weight:500}
+.notice{background:#FBEFEA;color:#7A2F28;border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.status{margin:0 0 14px;padding:0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.status dt{color:var(--ink2)}
+.status dd{margin:0;font-weight:500}
+.status .warn{color:#8A4B12}
+.install{margin:0 0 14px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.install p{margin:0 0 10px}
+.install p:last-child{margin:0}
+.quiet{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:-20px 0 32px;padding:10px 12px 10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink2);font-size:14px}
+.quiet .linkbtn{flex:none}
+.quiet.is-warn{background:#FBEFEA;border-color:#EFD3CA;color:#7A2F28}
+.quiet.is-warn .linkbtn{color:#7A2F28}
+.panel code{font:inherit;font-weight:500;color:var(--ink)}
+.panel b{font-weight:600;color:var(--ink)}
+.filebtn{display:inline-flex;align-items:center;cursor:pointer}
+.data-actions{display:flex;gap:10px;flex-wrap:wrap}
+.space{height:40px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,12px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:10;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="brand">Uren</div>
+    <nav class="tabs" role="tablist" aria-label="Weergave">
+      <button type="button" class="tab" role="tab" data-view="day">Dag</button>
+      <button type="button" class="tab" role="tab" data-view="list">Lijst</button>
+      <button type="button" class="tab" role="tab" data-view="types">Types</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- Dag -->
+  <section id="view-day" class="view">
+    <div class="daynav">
+      <button type="button" class="iconbtn" id="prevDay" aria-label="Vorige dag">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="daycenter">
+        <label class="daylabel"><span id="dayLabel"></span><input type="date" id="dayPicker" aria-label="Kies een datum"></label>
+        <div class="daysub"><span id="daySub"></span><button type="button" class="linkbtn" id="goToday">Naar vandaag</button></div>
+      </div>
+      <button type="button" class="iconbtn" id="nextDay" aria-label="Volgende dag">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="bar" id="dayBar" aria-hidden="true"></div>
+    <div class="daymeta"><span class="count" id="dayCount"></span><span class="total" id="dayTotal">0:00</span></div>
+
+    <ul class="entries" id="dayEntries"></ul>
+    <p class="empty" id="dayEmpty"></p>
+
+    <section class="panel booking" id="booking" aria-labelledby="bookingTitle">
+      <h2 id="bookingTitle">Uren boeken</h2>
+      <div class="chips" id="typeChips" role="radiogroup" aria-label="Type"></div>
+      <div class="presets" id="presets" role="group" aria-label="Snelle tijd"></div>
+      <div class="stepper">
+        <button type="button" class="stepbtn" id="minus" aria-label="15 minuten minder">−</button>
+        <div class="duration" id="durationOut" role="status" aria-live="polite">1:00</div>
+        <button type="button" class="stepbtn" id="plus" aria-label="15 minuten meer">+</button>
+      </div>
+      <input class="text" id="noteInput" placeholder="Notitie (optioneel)" maxlength="140" autocomplete="off">
+      <div class="actions">
+        <button type="button" class="primary" id="saveBtn">Boeken</button>
+        <button type="button" class="ghost" id="cancelEdit" hidden>Annuleren</button>
+        <button type="button" class="ghost" id="deleteBtn" hidden>Verwijderen</button>
+      </div>
+    </section>
+    <div class="quiet" id="dayNotice" hidden><span id="dayNoticeText"></span><button type="button" class="linkbtn" id="dayNoticeBtn"></button></div>
+  </section>
+
+  <!-- Lijst -->
+  <section id="view-list" class="view" hidden>
+    <div class="filters">
+      <div class="seg" id="periodSeg" role="group" aria-label="Periode">
+        <button type="button" data-period="7">7 dagen</button>
+        <button type="button" data-period="30">30 dagen</button>
+        <button type="button" data-period="90">90 dagen</button>
+        <button type="button" data-period="custom">Eigen periode</button>
+      </div>
+      <div class="range" id="customRange" hidden>
+        <label>Van <input type="date" id="fromDate"></label>
+        <label>Tot <input type="date" id="toDate"></label>
+      </div>
+      <div class="chips wrap-chips" id="filterChips" role="group" aria-label="Types"></div>
+    </div>
+
+    <div class="summary">
+      <div class="bar" id="listBar" aria-hidden="true"></div>
+      <div class="daymeta"><span class="count" id="listMeta"></span><span class="total" id="listTotal">0:00</span></div>
+      <ul class="legend" id="listLegend"></ul>
+    </div>
+
+    <div id="listGroups"></div>
+    <div class="list-foot">
+      <button type="button" class="ghost" id="exportCsv">Exporteer als CSV</button>
+    </div>
+  </section>
+
+  <!-- Types -->
+  <section id="view-types" class="view" hidden>
+    <ul class="typelist" id="typeList"></ul>
+    <div id="archivedWrap" hidden>
+      <h2 class="archived-head">Gearchiveerd</h2>
+      <ul class="typelist" id="archivedList"></ul>
+    </div>
+
+    <section class="panel" aria-labelledby="newTypeTitle">
+      <h2 id="newTypeTitle">Nieuw type</h2>
+      <input class="text" id="newTypeName" placeholder="Bijvoorbeeld: Cliëntcontact" maxlength="40" autocomplete="off">
+      <div class="swatches" id="newTypeSwatches" role="group" aria-label="Kleur" style="margin:12px 0"></div>
+      <button type="button" class="primary" id="addTypeBtn" style="flex:none">Type toevoegen</button>
+    </section>
+
+    <section class="panel" aria-labelledby="dataTitle">
+      <h2 id="dataTitle">Gegevens en opslag</h2>
+      <div class="notice" id="persistNotice" hidden>Deze browser bewaart niets: je gegevens verdwijnen als je de pagina sluit. Bewaar naar een bestand voordat je stopt.</div>
+      <dl class="status" id="storageStatus"></dl>
+      <div class="install" id="installBox" hidden></div>
+      <p><b>Bewaar naar bestand</b> zet alle uren als <code>uren-datum.json</code> in Bestanden (iPhone) of Drive, OneDrive of Downloads (Android). Dat bestand blijft staan als de app verwijderd wordt en is met <b>Bestand terugzetten</b> weer in te lezen, ook op een ander toestel. Op Android schrijft de app bij de eerste boeking van de dag zelf zo'n dagbestand naar Downloads.</p>
+      <div class="data-actions">
+        <button type="button" class="primary small" id="fileBtn" style="flex:none">Bewaar naar bestand</button>
+        <label class="ghost small filebtn">Bestand terugzetten<input type="file" id="importJson" accept="application/json,.json" hidden></label>
+      </div>
+    </section>
+    <div class="space"></div>
+  </section>
+</main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const KEY = 'uren-poc-v1';
+  const STEP = 15;
+  const MAX_MIN = 24 * 60;
+  const PALETTE = ['#0F6E5C','#2A8FA3','#2F6BB0','#6A5BC2','#9C4F9E','#B04B7E','#B0463E','#C8742A','#9C8420','#5E8B2F','#6E7F82'];
+  const UNKNOWN = { name: 'Onbekend type', color: '#9AA7A9' };
+  const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const pad = n => String(n).padStart(2, '0');
+  const toStr = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const fromStr = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+  const today = () => toStr(new Date());
+  const addDays = (s, n) => { const d = fromStr(s); d.setDate(d.getDate() + n); return toStr(d); };
+  const fmtMin = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
+  const fmtDec = m => (m / 60).toFixed(2).replace('.', ',');
+  const longDate = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const longDateYear = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const fullDate = s => (fromStr(s).getFullYear() === new Date().getFullYear() ? longDate : longDateYear).format(fromStr(s));
+  const relLabel = s => { const t = today(); return s === t ? 'Vandaag' : s === addDays(t, -1) ? 'Gisteren' : null; };
+  const dayTitle = s => relLabel(s) || fullDate(s);
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  // ---------- data ----------
+  // Two copies on the device: localStorage (fast, read at startup) and an IndexedDB mirror.
+  // At startup the newest of the two wins, so losing one of them does not lose the hours.
+  const storageInfo = { local: true, idb: true, persisted: null };
+  const valid = s => !!s && Array.isArray(s.types) && Array.isArray(s.entries);
+  const isHttp = location.protocol === 'https:' || location.protocol === 'http:';
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+
+  const SEED_VERSION = 2;
+  const DEFAULT_TYPES = [
+    'Direct patiëntencontact',
+    'Administratie patiënten',
+    'E-mail over patiënten',
+    'E-mail opleidingsgerelateerd',
+    'E-mail managementgerelateerd',
+    'Overige e-mail',
+    'MDO patiëntenzorg',
+    'MDO niet-patiëntenzorg',
+    'Opleidingstaken',
+    'Managementtaken',
+    'Overig',
+  ];
+  const defaultTypes = () => DEFAULT_TYPES.map((name, i) => ({ id: uid(), name, color: PALETTE[i % PALETTE.length], archived: false }));
+  function seed() { return { version: 1, seedVersion: SEED_VERSION, entries: [], types: defaultTypes() }; }
+  // An earlier build shipped four placeholder types. If those are still the only types and nothing
+  // has been booked yet, swap them for the current set.
+  const OLD_DEFAULTS = ['Cliëntcontact', 'Rapportage', 'Overleg', 'Reistijd'];
+  function upgradeSeed(s) {
+    if (s.seedVersion === SEED_VERSION) return s;
+    if (s.entries.length === 0 && s.types.every(t => OLD_DEFAULTS.includes(t.name))) s.types = defaultTypes();
+    s.seedVersion = SEED_VERSION;
+    return s;
+  }
+  function loadLocal() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) { const s = JSON.parse(raw); if (valid(s)) return upgradeSeed(s); }
+      localStorage.setItem(KEY + '-probe', '1'); localStorage.removeItem(KEY + '-probe');
+    } catch (e) { storageInfo.local = false; }
+    return null;
+  }
+  const DB = 'uren-poc', STORE = 'kv';
+  function idbOpen() {
+    return new Promise((res, rej) => {
+      if (!('indexedDB' in window)) return rej(new Error('no indexedDB'));
+      const r = indexedDB.open(DB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(STORE);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+      r.onblocked = () => rej(new Error('blocked'));
+    });
+  }
+  async function idbGet(key) {
+    const db = await idbOpen();
+    return new Promise((res, rej) => { const rq = db.transaction(STORE).objectStore(STORE).get(key); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
+  }
+  async function idbSet(key, val) {
+    const db = await idbOpen();
+    return new Promise((res, rej) => { const tx = db.transaction(STORE, 'readwrite'); tx.objectStore(STORE).put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); });
+  }
+  let persistRequested = false;
+  async function ensurePersistent(request) {
+    try {
+      if (!navigator.storage || !navigator.storage.persisted) { storageInfo.persisted = null; return; }
+      storageInfo.persisted = await navigator.storage.persisted();
+      if (!storageInfo.persisted && request && !persistRequested) { persistRequested = true; storageInfo.persisted = await navigator.storage.persist(); }
+    } catch (e) { storageInfo.persisted = null; }
+    if (ui.view === 'types') renderTypes();
+  }
+  function persist() {
+    state.savedAt = Date.now();
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { if (storageInfo.local) { storageInfo.local = false; if (ui.view === 'types') renderTypes(); } }
+    idbSet(KEY, JSON.parse(JSON.stringify(state))).then(() => { storageInfo.idb = true; }).catch(() => {
+      storageInfo.idb = false;
+      if (!storageInfo.local) toast('Bewaren lukt niet in deze browser. Bewaar naar een bestand via Types.', 4000);
+    });
+    if (!storageInfo.persisted) ensurePersistent(true);
+  }
+  // Android only: the first change of a day also writes uren-<datum>.json to Downloads, from within
+  // the tap that made the change, so the browser treats it as a normal download. iOS offers no
+  // equivalent; there the one-tap "Bewaar naar bestand" (share sheet) is the only route to a file.
+  const autoFileAvailable = () => isAndroid && !isIOS;
+  function save() {
+    persist();
+    if (autoFileAvailable() && (state.changesSinceFile || 0) > 0 && state.lastAutoFileDate !== today()) {
+      try {
+        download(fileName(), fileJson(), 'application/json');
+        state.lastAutoFileDate = today(); markFileSaved();
+        persist(); setTimeout(() => toast('Dagbestand opgeslagen in Downloads', 3000), 1300);
+      } catch (e) {}
+    }
+  }
+  const fileName = () => `uren-${today()}.json`;
+  const fileJson = () => JSON.stringify(state, null, 2);
+  const unsavedCount = () => state.changesSinceFile || 0;
+  function markChanged() { state.changesSinceFile = unsavedCount() + 1; }
+  function markFileSaved() { state.fileSavedAt = Date.now(); state.changesSinceFile = 0; }
+  async function restoreFromMirror() {
+    try {
+      const m = await idbGet(KEY);
+      if (!valid(m)) return;
+      if ((state.savedAt || 0) >= (m.savedAt || 0)) return;
+      state = upgradeSeed(m); resetDraft(); persist(); renderAll();
+      if (state.entries.length) toast('Uren hersteld uit de reservekopie op dit apparaat', 3500);
+    } catch (e) { storageInfo.idb = false; if (ui.view === 'types') renderTypes(); }
+  }
+  let state = loadLocal() || seed();
+
+  const ui = {
+    view: 'day', date: today(),
+    editingId: null, draft: { typeId: null, minutes: 60, note: '' }, confirmDelete: false,
+    period: '7', from: addDays(today(), -29), to: today(), typeFilter: new Set(),
+    editType: null, editName: '', editColor: PALETTE[0], newColor: PALETTE[0],
+  };
+
+  const typeById = id => state.types.find(t => t.id === id);
+  const activeTypes = () => state.types.filter(t => !t.archived);
+  const entriesOn = d => state.entries.filter(e => e.date === d).sort((a, b) => a.created - b.created);
+  const sumMin = arr => arr.reduce((a, e) => a + e.minutes, 0);
+  function totalsByType(entries) {
+    const m = new Map();
+    for (const e of entries) m.set(e.typeId, (m.get(e.typeId) || 0) + e.minutes);
+    return state.types.filter(t => m.has(t.id)).map(t => ({ type: t, minutes: m.get(t.id) }));
+  }
+  function resetDraft() {
+    const act = activeTypes();
+    const keep = ui.draft.typeId && act.some(t => t.id === ui.draft.typeId);
+    ui.draft = { typeId: keep ? ui.draft.typeId : (act[0] ? act[0].id : null), minutes: ui.draft.minutes || 60, note: '' };
+  }
+
+  // ---------- render ----------
+  function renderBar(el, entries, scaleMin) {
+    const total = sumMin(entries);
+    const scale = Math.max(scaleMin, total) || 1;
+    el.innerHTML = totalsByType(entries).map(x =>
+      `<span class="seg" data-w="${(x.minutes / scale * 100).toFixed(2)}%" style="width:0;background:${x.type.color}" title="${esc(x.type.name)} ${fmtMin(x.minutes)}"></span>`).join('');
+    requestAnimationFrame(() => el.querySelectorAll('.seg').forEach(s => { s.style.width = s.dataset.w; }));
+  }
+
+  function entryHTML(e) {
+    const ty = typeById(e.typeId) || UNKNOWN;
+    return `<li><button type="button" class="entry${e.id === ui.editingId ? ' is-editing' : ''}" data-edit="${e.id}" aria-label="${esc(ty.name)}, ${fmtMin(e.minutes)}${e.note ? ', ' + esc(e.note) : ''}. Bewerken">
+      <span class="dot" style="background:${ty.color}"></span>
+      <span class="entry-main"><span class="entry-type">${esc(ty.name)}</span>${e.note ? `<span class="entry-note">${esc(e.note)}</span>` : ''}</span>
+      <span class="entry-dur">${fmtMin(e.minutes)}</span></button></li>`;
+  }
+
+  function renderDay() {
+    const t = today(), isToday = ui.date === t;
+    $('#dayLabel').textContent = dayTitle(ui.date);
+    $('#daySub').textContent = relLabel(ui.date) ? fullDate(ui.date) : '';
+    $('#dayPicker').value = ui.date;
+    $('#goToday').hidden = isToday;
+    const es = entriesOn(ui.date);
+    renderBar($('#dayBar'), es, 8 * 60);
+    $('#dayTotal').textContent = fmtMin(sumMin(es));
+    $('#dayCount').textContent = es.length ? plural(es.length, 'boeking', 'boekingen') : '';
+    $('#dayEntries').innerHTML = es.map(entryHTML).join('');
+    const empty = $('#dayEmpty');
+    empty.hidden = es.length > 0;
+    empty.textContent = isToday ? 'Nog niets geboekt vandaag. Kies hieronder een type, stel de tijd in en boek.' : 'Nog niets geboekt op deze dag. Kies hieronder een type, stel de tijd in en boek.';
+    renderBooking();
+    renderDayNotice();
+  }
+
+  function renderBooking() {
+    const editing = !!ui.editingId;
+    $('#bookingTitle').textContent = editing ? 'Boeking bewerken' : 'Uren boeken';
+    let list = activeTypes();
+    const cur = typeById(ui.draft.typeId);
+    if (cur && cur.archived) list = [...list, cur];
+    $('#typeChips').innerHTML = list.length
+      ? list.map(t => `<button type="button" class="chip${t.id === ui.draft.typeId ? ' is-selected' : ''}" data-type="${t.id}" style="--c:${t.color}" role="radio" aria-checked="${t.id === ui.draft.typeId}"><span class="dot"></span>${esc(t.name)}</button>`).join('')
+      : `<p class="hint">Nog geen types. Maak er eerst een aan onder <button type="button" class="linkbtn" data-goto="types">Types</button>.</p>`;
+    syncDuration();
+    $('#noteInput').value = ui.draft.note;
+    $('#saveBtn').textContent = editing ? 'Opslaan' : 'Boeken';
+    $('#cancelEdit').hidden = !editing;
+    const del = $('#deleteBtn');
+    del.hidden = !editing;
+    del.textContent = ui.confirmDelete ? 'Ja, verwijderen' : 'Verwijderen';
+    del.classList.toggle('is-armed', ui.confirmDelete);
+  }
+
+  function listRange() {
+    if (ui.period === 'custom') return [ui.from || '0000-01-01', ui.to || '9999-12-31'];
+    const n = Number(ui.period), t = today();
+    return [addDays(t, -(n - 1)), t];
+  }
+
+  function renderList() {
+    $$('#periodSeg button').forEach(b => b.classList.toggle('is-active', b.dataset.period === ui.period));
+    $('#customRange').hidden = ui.period !== 'custom';
+    $('#fromDate').value = ui.from; $('#toDate').value = ui.to;
+
+    const [from, to] = listRange();
+    const inRange = state.entries.filter(e => e.date >= from && e.date <= to);
+    const relevant = state.types.filter(t => !t.archived || inRange.some(e => e.typeId === t.id));
+    const all = ui.typeFilter.size === 0;
+    $('#filterChips').innerHTML =
+      `<button type="button" class="chip chip-all${all ? ' is-selected' : ''}" data-filter="all" aria-pressed="${all}">Alle types</button>` +
+      relevant.map(t => `<button type="button" class="chip${ui.typeFilter.has(t.id) ? ' is-selected' : ''}" data-filter="${t.id}" style="--c:${t.color}" aria-pressed="${ui.typeFilter.has(t.id)}"><span class="dot"></span>${esc(t.name)}</button>`).join('');
+
+    const shown = all ? inRange : inRange.filter(e => ui.typeFilter.has(e.typeId));
+    renderBar($('#listBar'), shown, 0);
+    $('#listTotal').textContent = fmtMin(sumMin(shown));
+    const days = new Set(shown.map(e => e.date)).size;
+    $('#listMeta').textContent = shown.length ? `${plural(shown.length, 'boeking', 'boekingen')} op ${plural(days, 'dag', 'dagen')}` : 'Geen boekingen in deze periode';
+    $('#listLegend').innerHTML = totalsByType(shown).map(x =>
+      `<li><span class="dot" style="background:${x.type.color}"></span><span class="legend-name">${esc(x.type.name)}</span><span class="legend-val">${fmtMin(x.minutes)}</span></li>`).join('');
+
+    const byDate = new Map();
+    for (const e of shown) { if (!byDate.has(e.date)) byDate.set(e.date, []); byDate.get(e.date).push(e); }
+    const chev = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+    $('#listGroups').innerHTML = [...byDate.keys()].sort().reverse().map(d => {
+      const es = byDate.get(d).sort((a, b) => a.created - b.created);
+      return `<section class="group"><div class="group-head">
+        <button type="button" class="open" data-open-day="${d}" aria-label="Open ${esc(fullDate(d))}">${esc(dayTitle(d))}${chev}</button>
+        <span class="group-total">${fmtMin(sumMin(es))}</span></div>
+        <ul class="entries">${es.map(entryHTML).join('')}</ul></section>`;
+    }).join('');
+    $('#exportCsv').disabled = shown.length === 0;
+  }
+
+  function swatchesHTML(sel, ctx) {
+    return PALETTE.map(c => `<button type="button" class="swatch${c === sel ? ' is-selected' : ''}" data-swatch="${c}" data-ctx="${ctx}" style="background:${c}" aria-label="Kleur" aria-pressed="${c === sel}"></button>`).join('');
+  }
+
+  function renderTypes() {
+    const mins = new Map(), nums = new Map();
+    for (const e of state.entries) { mins.set(e.typeId, (mins.get(e.typeId) || 0) + e.minutes); nums.set(e.typeId, (nums.get(e.typeId) || 0) + 1); }
+    const row = t => {
+      const n = nums.get(t.id) || 0;
+      if (ui.editType === t.id) {
+        return `<li class="type-row type-edit">
+          <input class="text" id="editTypeName" value="${esc(ui.editName)}" aria-label="Naam van het type" maxlength="40" autocomplete="off">
+          <div class="swatches" role="group" aria-label="Kleur">${swatchesHTML(ui.editColor, 'edit')}</div>
+          <div class="row-actions">
+            <button type="button" class="primary small" style="flex:none" data-save-type="${t.id}">Opslaan</button>
+            <button type="button" class="ghost small" data-cancel-type>Annuleren</button>
+            ${t.archived ? `<button type="button" class="ghost small" data-unarchive="${t.id}">Herstellen</button>` : `<button type="button" class="ghost small" data-archive="${t.id}">Archiveren</button>`}
+            ${n === 0 ? `<button type="button" class="ghost small danger-text" data-delete-type="${t.id}">Verwijderen</button>` : ''}
+          </div>
+          ${n > 0 ? `<p class="hint">${plural(n, 'boeking gebruikt', 'boekingen gebruiken')} dit type. Archiveren verbergt het bij het boeken; bestaande uren blijven staan.</p>` : ''}
+        </li>`;
+      }
+      return `<li class="type-row"><span class="dot" style="background:${t.color}"></span><span class="type-name">${esc(t.name)}</span><span class="type-total">${fmtMin(mins.get(t.id) || 0)}</span><button type="button" class="ghost small" data-edit-type="${t.id}">Bewerken</button></li>`;
+    };
+    const act = activeTypes(), arch = state.types.filter(t => t.archived);
+    $('#typeList').innerHTML = act.map(row).join('') || `<li class="hint" style="padding:12px 4px">Nog geen types. Voeg er hieronder een toe.</li>`;
+    $('#archivedWrap').hidden = arch.length === 0;
+    $('#archivedList').innerHTML = arch.map(row).join('');
+    $('#newTypeSwatches').innerHTML = swatchesHTML(ui.newColor, 'new');
+    renderStorage();
+  }
+
+  const agoText = ts => { const days = Math.floor((Date.now() - ts) / 864e5); return days <= 0 ? 'vandaag' : days === 1 ? 'gisteren' : `${days} dagen geleden`; };
+  // Unsaved bookings from before today are the thing to worry about; today's are normal.
+  function unsavedSinceYesterday() {
+    if (!unsavedCount()) return false;
+    const since = state.fileSavedAt || Math.min(...state.entries.map(e => e.created || Date.now()));
+    return Date.now() - since > 864e5;
+  }
+  function renderStorage() {
+    $('#persistNotice').hidden = storageInfo.local || storageInfo.idb;
+    const standalone = isStandalone();
+    const kb = Math.max(1, Math.round(new Blob([JSON.stringify(state)]).size / 1024));
+    const persisted = storageInfo.persisted === true ? '<dd>Ja</dd>' : storageInfo.persisted === false ? '<dd class="warn">Nee, de browser mag opruimen bij ruimtegebrek</dd>' : '<dd>Onbekend in deze browser</dd>';
+    $('#storageStatus').innerHTML =
+      `<dt>Als app geïnstalleerd</dt>${standalone ? '<dd>Ja</dd>' : '<dd class="warn">Nee</dd>'}` +
+      `<dt>Opslag beschermd</dt>${persisted}` +
+      `<dt>In bestand</dt>${unsavedCount() ? `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>` : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
+      `<dt>Laatste bestand</dt><dd>${state.fileSavedAt ? agoText(state.fileSavedAt) : 'Nog geen'}</dd>` +
+      `<dt>Dagbestand</dt><dd>${autoFileAvailable() ? 'Automatisch naar Downloads' : 'Niet mogelijk op dit toestel'}</dd>` +
+      `<dt>Omvang</dt><dd>${plural(state.entries.length, 'boeking', 'boekingen')}, ${kb} kB</dd>`;
+    const box = $('#installBox');
+    if (standalone) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    if (!isHttp) box.innerHTML = '<p>Installeren als app en offline gebruik werken alleen als deze bestanden op een https-adres staan, niet vanuit een los bestand.</p>';
+    else if (installPrompt) box.innerHTML = '<p>Als geïnstalleerde app werkt Uren offline en is de opslag beter beschermd tegen opruimen door de browser.</p><button type="button" class="primary small" id="installBtn" style="flex:none">Installeer als app</button>';
+    else if (isIOS) box.innerHTML = '<p>Installeer als app: tik in Safari op Delen en kies “Zet op beginscherm”.</p><p>Doe dit vóór je gaat boeken. De app op het beginscherm heeft eigen opslag; wat je in Safari boekt komt daar niet in. Al uren geboekt? Maak hier een backup en zet die in de app terug.</p>';
+    else box.innerHTML = '<p>Installeer als app via het browsermenu (“App installeren” of “Toevoegen aan startscherm”). Dan werkt Uren offline en is de opslag beter beschermd.</p>';
+  }
+  function renderDayNotice() {
+    const n = $('#dayNotice'), txt = $('#dayNoticeText'), btn = $('#dayNoticeBtn');
+    if (unsavedCount()) {
+      txt.textContent = `${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet in een bestand.`;
+      btn.textContent = 'Bewaar naar bestand'; btn.dataset.action = 'file';
+      n.classList.toggle('is-warn', unsavedSinceYesterday()); n.hidden = false; return;
+    }
+    n.classList.remove('is-warn');
+    if (isHttp && !isStandalone()) { txt.textContent = 'Installeer Uren als app voor veilige opslag en offline gebruik.'; btn.textContent = 'Hoe?'; btn.dataset.action = 'install-help'; n.hidden = false; return; }
+    n.hidden = true;
+  }
+
+  function renderAll() { renderDay(); renderList(); renderTypes(); }
+
+  function setView(v) {
+    ui.view = v;
+    $$('.view').forEach(s => { s.hidden = s.id !== 'view-' + v; });
+    $$('.tab').forEach(t => { const on = t.dataset.view === v; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); });
+    if (v === 'day') renderDay(); else if (v === 'list') renderList(); else renderTypes();
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- actions ----------
+  let toastT;
+  function toast(msg, ms = 2200) { const el = $('#toast'); el.textContent = msg; el.classList.add('is-visible'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('is-visible'), ms); }
+
+  function setDate(d) { if (!d) return; ui.date = d; ui.editingId = null; ui.confirmDelete = false; resetDraft(); renderDay(); }
+
+  function startEdit(id) {
+    const e = state.entries.find(x => x.id === id); if (!e) return;
+    if (ui.editingId === id) { cancelEdit(); return; }
+    ui.editingId = id; ui.confirmDelete = false;
+    ui.draft = { typeId: e.typeId, minutes: e.minutes, note: e.note || '' };
+    renderDay();
+    $('#booking').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  }
+  function cancelEdit() { ui.editingId = null; ui.confirmDelete = false; resetDraft(); renderDay(); }
+
+  function saveEntry() {
+    const note = $('#noteInput').value.trim(), d = ui.draft;
+    if (!d.typeId) { toast('Kies eerst een type.'); return; }
+    if (ui.editingId) {
+      const e = state.entries.find(x => x.id === ui.editingId);
+      if (e) { e.typeId = d.typeId; e.minutes = d.minutes; e.note = note; }
+      ui.editingId = null; markChanged(); toast('Boeking opgeslagen');
+    } else {
+      state.entries.push({ id: uid(), date: ui.date, typeId: d.typeId, minutes: d.minutes, note, created: Date.now() });
+      markChanged();
+      toast(`${fmtMin(d.minutes)} geboekt op ${(typeById(d.typeId) || UNKNOWN).name}`);
+    }
+    ui.confirmDelete = false; ui.draft.note = '';
+    save(); renderDay();
+  }
+  function deleteEntry() {
+    if (!ui.editingId) return;
+    if (!ui.confirmDelete) { ui.confirmDelete = true; renderBooking(); return; }
+    state.entries = state.entries.filter(x => x.id !== ui.editingId);
+    markChanged();
+    ui.editingId = null; ui.confirmDelete = false; resetDraft();
+    save(); renderDay(); toast('Boeking verwijderd');
+  }
+
+  const PRESETS = [15, 30, 45, 60];
+  function syncDuration() {
+    const m = ui.draft.minutes;
+    $('#durationOut').textContent = fmtMin(m);
+    $('#minus').disabled = m <= STEP;
+    $('#plus').disabled = m >= MAX_MIN;
+    $('#presets').innerHTML = PRESETS.map(p =>
+      `<button type="button" class="preset${m === p ? ' is-selected' : ''}" data-preset="${p}" aria-pressed="${m === p}">${p === 60 ? '1 uur' : p + ' min'}</button>`).join('');
+  }
+  function setMinutes(m) { ui.draft.minutes = Math.min(MAX_MIN, Math.max(STEP, m)); syncDuration(); }
+  function step(dir) { setMinutes(ui.draft.minutes + dir * STEP); }
+  // Tap = one step. Only a long press (600 ms) starts repeating, and then calmly.
+  function holdable(btn, dir) {
+    let delay, repeat, held = false, reset;
+    const stop = () => {
+      clearTimeout(delay); clearInterval(repeat);
+      clearTimeout(reset); reset = setTimeout(() => { held = false; }, 600);
+    };
+    btn.addEventListener('pointerdown', () => {
+      if (btn.disabled) return;
+      clearTimeout(reset); held = false;
+      delay = setTimeout(() => { held = true; step(dir); repeat = setInterval(() => step(dir), 250); }, 600);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(n => btn.addEventListener(n, stop));
+    btn.addEventListener('click', () => { if (held) { held = false; return; } step(dir); });
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
+  function addType() {
+    const input = $('#newTypeName'), name = input.value.trim();
+    if (!name) { toast('Geef het type een naam.'); input.focus(); return; }
+    if (activeTypes().some(t => t.name.toLowerCase() === name.toLowerCase())) { toast('Dit type bestaat al.'); return; }
+    state.types.push({ id: uid(), name, color: ui.newColor, archived: false });
+    input.value = '';
+    ui.newColor = PALETTE[state.types.length % PALETTE.length];
+    if (!ui.draft.typeId) resetDraft();
+    save(); renderAll(); toast(`Type "${name}" toegevoegd`);
+  }
+
+  function download(name, text, mime) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  function exportCsv() {
+    const [from, to] = listRange();
+    const all = ui.typeFilter.size === 0;
+    const rows = state.entries.filter(e => e.date >= from && e.date <= to && (all || ui.typeFilter.has(e.typeId)))
+      .sort((a, b) => a.date.localeCompare(b.date) || a.created - b.created);
+    const q = v => /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    const lines = ['Datum;Type;Notitie;Minuten;Uren', ...rows.map(e => [e.date, (typeById(e.typeId) || UNKNOWN).name, e.note || '', e.minutes, fmtDec(e.minutes)].map(v => q(String(v))).join(';'))];
+    download(`uren_${from}_${to}.csv`, '\uFEFF' + lines.join('\r\n'), 'text/csv;charset=utf-8');
+  }
+
+  // ---------- events ----------
+  document.addEventListener('click', ev => {
+    const b = ev.target.closest('button'); if (!b) return;
+    const d = b.dataset;
+    if (d.view) return setView(d.view);
+    if (d.goto) return setView(d.goto);
+    if (d.edit) {
+      const e = state.entries.find(x => x.id === d.edit); if (!e) return;
+      if (ui.view !== 'day') { ui.date = e.date; setView('day'); }
+      return startEdit(d.edit);
+    }
+    if (d.type) { ui.draft.typeId = d.type; ui.confirmDelete = false; ui.draft.note = $('#noteInput').value; return renderBooking(); }
+    if (d.preset) return setMinutes(Number(d.preset));
+    if (d.filter) {
+      if (d.filter === 'all') ui.typeFilter.clear();
+      else if (ui.typeFilter.has(d.filter)) ui.typeFilter.delete(d.filter); else ui.typeFilter.add(d.filter);
+      return renderList();
+    }
+    if (d.period) { ui.period = d.period; return renderList(); }
+    if (d.openDay) { ui.date = d.openDay; ui.editingId = null; resetDraft(); return setView('day'); }
+    if (d.editType) { const t = typeById(d.editType); if (!t) return; ui.editType = t.id; ui.editName = t.name; ui.editColor = t.color; return renderTypes(); }
+    if (d.swatch) { if (d.ctx === 'new') ui.newColor = d.swatch; else ui.editColor = d.swatch; return renderTypes(); }
+    if ('cancelType' in d) { ui.editType = null; return renderTypes(); }
+    if (d.saveType) {
+      const t = typeById(d.saveType); if (!t) return;
+      const name = $('#editTypeName').value.trim();
+      if (!name) { toast('Geef het type een naam.'); return; }
+      t.name = name; t.color = ui.editColor; ui.editType = null;
+      save(); renderAll(); return toast('Type opgeslagen');
+    }
+    if (d.archive || d.unarchive) {
+      const t = typeById(d.archive || d.unarchive); if (!t) return;
+      t.archived = !!d.archive; ui.editType = null;
+      if (t.archived && ui.draft.typeId === t.id && !ui.editingId) { ui.draft.typeId = null; resetDraft(); }
+      save(); renderAll(); return toast(t.archived ? 'Type gearchiveerd' : 'Type hersteld');
+    }
+    if (d.deleteType) {
+      if (state.entries.some(e => e.typeId === d.deleteType)) { toast('Dit type heeft nog boekingen.'); return; }
+      state.types = state.types.filter(t => t.id !== d.deleteType); ui.editType = null;
+      if (ui.draft.typeId === d.deleteType) { ui.draft.typeId = null; resetDraft(); }
+      save(); renderAll(); return toast('Type verwijderd');
+    }
+  });
+
+  document.addEventListener('input', ev => {
+    if (ev.target.id === 'editTypeName') ui.editName = ev.target.value;
+    if (ev.target.id === 'noteInput') ui.draft.note = ev.target.value;
+  });
+  document.addEventListener('keydown', ev => {
+    if (ev.key !== 'Enter') return;
+    if (ev.target.id === 'noteInput') { ev.preventDefault(); saveEntry(); }
+    if (ev.target.id === 'newTypeName') { ev.preventDefault(); addType(); }
+    if (ev.target.id === 'editTypeName') { ev.preventDefault(); const b = document.querySelector('[data-save-type]'); if (b) b.click(); }
+  });
+
+  $('#prevDay').addEventListener('click', () => setDate(addDays(ui.date, -1)));
+  $('#nextDay').addEventListener('click', () => setDate(addDays(ui.date, 1)));
+  $('#goToday').addEventListener('click', () => setDate(today()));
+  const picker = $('#dayPicker');
+  picker.addEventListener('change', () => setDate(picker.value));
+  picker.addEventListener('click', ev => { if (typeof picker.showPicker === 'function') { ev.preventDefault(); try { picker.showPicker(); } catch (e) {} } });
+  holdable($('#minus'), -1); holdable($('#plus'), 1);
+  $('#saveBtn').addEventListener('click', saveEntry);
+  $('#cancelEdit').addEventListener('click', cancelEdit);
+  $('#deleteBtn').addEventListener('click', deleteEntry);
+  $('#fromDate').addEventListener('change', ev => { ui.from = ev.target.value; renderList(); });
+  $('#toDate').addEventListener('change', ev => { ui.to = ev.target.value; renderList(); });
+  $('#exportCsv').addEventListener('click', exportCsv);
+  $('#addTypeBtn').addEventListener('click', addType);
+  async function saveToFile() {
+    const name = fileName(), json = fileJson();
+    let done = false;
+    if (navigator.share && navigator.canShare && typeof File === 'function') {
+      try {
+        const file = new File([json], name, { type: 'application/json' });
+        if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Uren' }); done = true; }
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    if (!done) download(name, json, 'application/json');
+    markFileSaved(); persist(); renderAll(); toast('Bestand bewaard');
+  }
+  $('#fileBtn').addEventListener('click', saveToFile);
+  $('#dayNoticeBtn').addEventListener('click', ev => {
+    const a = ev.currentTarget.dataset.action;
+    if (a === 'file') saveToFile();
+    else { setView('types'); const b = $('#installBox'); if (b && !b.hidden) b.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); }
+  });
+
+  // install prompt (Android/desktop Chrome and Edge fire this; iOS never does)
+  let installPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; if (ui.view === 'types') renderTypes(); });
+  window.addEventListener('appinstalled', () => { installPrompt = null; toast('Uren staat nu als app op je toestel'); ensurePersistent(true); renderAll(); });
+  document.addEventListener('click', async ev => {
+    if (!ev.target.closest('#installBtn') || !installPrompt) return;
+    const p = installPrompt; installPrompt = null;
+    try { p.prompt(); await p.userChoice; } catch (e) {}
+    renderTypes();
+  });
+  if (window.matchMedia) { try { matchMedia('(display-mode: standalone)').addEventListener('change', renderAll); } catch (e) {} }
+
+  // offline: service worker (only over http(s); a local file cannot register one)
+  if ('serviceWorker' in navigator && isHttp) {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing; if (!nw) return;
+        nw.addEventListener('statechange', () => { if (nw.state === 'installed' && navigator.serviceWorker.controller) toast('Nieuwe versie klaar. Sluit Uren helemaal en open het opnieuw.', 5000); });
+      });
+    }).catch(() => {});
+  }
+  $('#importJson').addEventListener('change', async ev => {
+    const f = ev.target.files && ev.target.files[0]; if (!f) return;
+    try {
+      const s = JSON.parse(await f.text());
+      if (!s || !Array.isArray(s.types) || !Array.isArray(s.entries)) throw new Error('shape');
+      state = { version: 1, types: s.types, entries: s.entries };
+      ui.editingId = null; ui.editType = null; ui.typeFilter.clear(); ui.draft.typeId = null; resetDraft();
+      markFileSaved(); persist(); renderAll(); toast('Bestand teruggezet');
+    } catch (e) { toast('Dit bestand is geen geldige backup.'); }
+    ev.target.value = '';
+  });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ui.view === 'day') renderDay(); });
+
+  // ---------- start ----------
+  resetDraft();
+  renderAll();
+  setView('day');
+  ensurePersistent(false);
+  restoreFromMirror();
+  if (!storageInfo.local) toast('Let op: deze browser bewaart mogelijk niets. Maak een backup via Types.', 4000);
+})();
+</script>
+</body>
+</html>

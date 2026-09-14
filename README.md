@@ -29,14 +29,17 @@ Deel daarna het adres van `index.html`.
 - Als geïnstalleerde app ruimt de browser de opslag niet automatisch op. In gewoon Safari wordt opslag van sites die 7 dagen niet gebruikt zijn wél gewist; de app op het beginscherm valt daar buiten. Op Android vraagt de app *persistent storage* aan; het paneel Gegevens en opslag laat zien of dat gelukt is.
 - Wat de opslag op het toestel wél verwijdert: de app verwijderen, op iOS *Wis geschiedenis en websitegegevens*, op Android de sitegegevens van het domein wissen, of een kwijtgeraakt toestel. Daartegen beschermt alleen een bestand buiten de app-opslag.
 
-### Het bestand
+### Het urenbestand (Android)
 
-- **Bewaar naar bestand** (Types → Gegevens en opslag, en de regel onder het boekpaneel) zet alle uren als `uren-datum.json` via het deelmenu in Bestanden/iCloud Drive (iPhone) of Drive, OneDrive of Downloads (Android). Dat bestand staat buiten de app en blijft dus staan als de app verwijderd wordt.
-- De app telt de boekingen die nog niet in een bestand staan en toont dat onder het boekpaneel; staan er boekingen van gisteren of eerder nog niet in, dan kleurt die regel rood. Eén tik lost het op.
-- **Android** schrijft bovendien bij de eerste boeking van de dag automatisch `uren-datum.json` naar Downloads (één bestand per dag, met alle uren tot dat moment). Op iPhone bestaat geen manier om zonder tik een bestand weg te schrijven; daar is de ene tik per dag het minimum.
-- **Bestand terugzetten** leest zo'n bestand weer in, ook op een ander toestel. Neem altijd het nieuwste bestand (de datum staat in de naam).
+- Chrome op Android (versie 132 en nieuwer, januari 2025) laat een webapp één bestand aanmaken of kiezen en daarna steeds opnieuw beschrijven. Uren gebruikt dat: bij de eerste start vraagt een balk bovenaan om **Bestand aanmaken** (kies bijvoorbeeld Downloads, naam `uren.json`). Daarna schrijft de app na elke boeking, wijziging of verwijdering de complete stand in datzelfde bestand. Geen nieuwe bestanden, geen downloadmeldingen.
+- Chrome kan bij de eerste boeking na het openen van de app één keer vragen of Uren het bestand mag bewerken; sta dat toe.
+- Het bestand staat buiten de app-opslag. Wordt de app verwijderd of komt er een nieuw toestel, dan kies je bij de eerste start **Bestaand bestand kiezen**, wijst `uren.json` aan en alles staat er weer.
+- Lukt het schrijven niet (bestand verwijderd, toestemming geweigerd), dan wordt de balk bovenaan rood met het aantal boekingen dat nog niet in het bestand staat, en een knop om het opnieuw te proberen of een ander bestand te koppelen. De uren zelf staan intussen gewoon in de app-opslag.
+- Onder Types → Gegevens en opslag zie je welk bestand gekoppeld is, en kun je een ander bestand koppelen of loskoppelen.
 
-Een webapp kan op een telefoon geen bestand ongemerkt lezen en overschrijven; die API bestaat alleen in Chrome/Edge op desktop. Een oplossing die op alle toestellen zonder enige tik werkt, vraagt om een server.
+### iPhone
+
+Safari heeft deze mogelijkheid niet en Apple heeft aangegeven die niet te gaan bouwen. Op iPhone is **Bewaar naar bestand** (deelmenu → Bewaar in Bestanden) de weg naar een kopie buiten de app; de app telt hoeveel boekingen nog niet in een bestand staan en toont dat onder het boekpaneel. **Bestand terugzetten** leest zo'n bestand weer in.
 
 ## 4. Nieuwe versie uitrollen
 

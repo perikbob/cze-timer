@@ -61,7 +61,7 @@ h2,h3{line-height:1.25}
 .daymeta .count{color:var(--ink2);font-size:14px}
 .daymeta .total{font-size:26px;font-weight:600;letter-spacing:-.01em}
 
-.entries{list-style:none;margin:6px 0 0;padding:0}
+.entries{list-style:none;margin:0 0 24px;padding:0}
 .entries>li{border-bottom:1px solid var(--line)}
 .entries>li:last-child{border-bottom:0}
 .entry{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 8px 13px 6px;border-radius:10px;margin:1px 0}
@@ -72,32 +72,40 @@ h2,h3{line-height:1.25}
 .entry-type{font-weight:500}
 .entry-note{color:var(--ink2);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .entry-dur{font-weight:600;font-size:17px}
-.empty{color:var(--ink2);margin:18px 0 0;font-size:15px}
+.empty{color:var(--ink2);margin:10px 0 24px;font-size:15px}
 
 /* form panels */
 .panel{margin:24px 0;padding:18px 16px 16px;background:var(--tint);border-radius:16px}
 .panel h2{margin:0 0 12px;font-size:16px;font-weight:600}
 .panel p{margin:0 0 12px;color:var(--ink2);font-size:14px}
-.booking{margin-bottom:40px}
-.chips{display:flex;flex-wrap:wrap;gap:10px;padding:2px}
+.booking{margin:14px 0 6px;padding:14px 16px 14px}
+.booking h2{margin-bottom:10px}
+.listhead{margin:22px 0 2px;font-size:14px;font-weight:600;color:var(--ink2)}
+.strip{position:relative;margin:0 -16px}
+.strip::after{content:'';position:absolute;top:0;right:0;bottom:6px;width:36px;background:linear-gradient(90deg,rgba(234,240,238,0),var(--tint));pointer-events:none;opacity:1;transition:opacity .2s}
+.strip.at-end::after{opacity:0}
+.chips{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);gap:8px;padding:2px 16px 6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chips.wrap-chips{display:flex;flex-wrap:wrap;gap:10px;overflow:visible;padding:2px}
+.chip{scroll-snap-align:start}
 .chip{display:inline-flex;align-items:center;gap:9px;padding:10px 16px;min-height:44px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);white-space:nowrap;font-weight:500;--c:var(--ink2)}
 .chip:hover{border-color:var(--c)}
 .chip .dot{background:var(--c)}
 .chip.is-selected{background:var(--c);border-color:var(--c);color:#fff}
 .chip.is-selected .dot{background:rgba(255,255,255,.75)}
 .chip-all{--c:var(--ink)}
-.presets{display:flex;gap:10px;margin-top:18px;padding:2px}
+.presets{display:flex;gap:10px;margin-top:12px;padding:2px}
 .preset{flex:1;min-width:0;min-height:44px;padding:10px 6px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:600;white-space:nowrap}
 .preset:hover:not(.is-selected){background:#EEF3F1}
 .preset.is-selected{background:var(--ink);border-color:var(--ink);color:#fff}
-.stepper{display:flex;align-items:center;justify-content:center;gap:18px;padding:16px 0 12px}
-.stepbtn{width:52px;height:52px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);font-size:26px;line-height:1;display:grid;place-items:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.stepper{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 0 10px}
+.stepbtn{width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);font-size:26px;line-height:1;display:grid;place-items:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .stepbtn:hover:not(:disabled){background:#EEF3F1}
 .stepbtn:disabled{opacity:.4}
-.duration{font-size:36px;font-weight:600;min-width:120px;text-align:center;letter-spacing:-.02em;line-height:1;user-select:none;-webkit-user-select:none}
+.duration{font-size:32px;font-weight:600;min-width:120px;text-align:center;letter-spacing:-.02em;line-height:1;user-select:none;-webkit-user-select:none}
 .text{width:100%;height:46px;padding:0 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface)}
 .text::placeholder{color:#8A9799}
-.actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
 .primary{background:var(--accent);color:#fff;font-weight:600;height:46px;padding:0 20px;border-radius:10px;flex:1}
 .primary:hover{background:var(--accent-dark)}
 .ghost{height:46px;padding:0 16px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:500}
@@ -153,8 +161,14 @@ h2,h3{line-height:1.25}
 .install{margin:0 0 14px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .install p{margin:0 0 10px}
 .install p:last-child{margin:0}
-.quiet{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:-20px 0 32px;padding:10px 12px 10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink2);font-size:14px}
+.quiet{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:16px 0 32px;padding:10px 12px 10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink2);font-size:14px}
 .quiet .linkbtn{flex:none}
+.banner{margin:18px 0 -4px;padding:14px 16px;border-radius:14px;background:var(--accent-soft);color:var(--ink)}
+.banner.is-error{background:#FBEFEA}
+.banner-text{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2)}
+.banner-text b{font-size:15px;color:var(--ink);font-weight:600}
+.banner.is-error .banner-text b{color:#7A2F28}
+.banner-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
 .quiet.is-warn{background:#FBEFEA;border-color:#EFD3CA;color:#7A2F28}
 .quiet.is-warn .linkbtn{color:#7A2F28}
 .panel code{font:inherit;font-weight:500;color:var(--ink)}
@@ -184,6 +198,10 @@ h2,h3{line-height:1.25}
 <main class="wrap">
   <!-- Dag -->
   <section id="view-day" class="view">
+    <div class="banner" id="dayBanner" hidden>
+      <div class="banner-text"><b id="bannerTitle"></b><span id="bannerBody"></span></div>
+      <div class="banner-actions" id="bannerActions"></div>
+    </div>
     <div class="daynav">
       <button type="button" class="iconbtn" id="prevDay" aria-label="Vorige dag">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -200,12 +218,9 @@ h2,h3{line-height:1.25}
     <div class="bar" id="dayBar" aria-hidden="true"></div>
     <div class="daymeta"><span class="count" id="dayCount"></span><span class="total" id="dayTotal">0:00</span></div>
 
-    <ul class="entries" id="dayEntries"></ul>
-    <p class="empty" id="dayEmpty"></p>
-
-    <section class="panel booking" id="booking" aria-labelledby="bookingTitle">
-      <h2 id="bookingTitle">Uren boeken</h2>
-      <div class="chips" id="typeChips" role="radiogroup" aria-label="Type"></div>
+    <section class="panel booking" id="booking" aria-label="Uren boeken">
+      <h2 id="bookingTitle" hidden>Boeking bewerken</h2>
+      <div class="strip" id="typeStrip"><div class="chips" id="typeChips" role="radiogroup" aria-label="Type"></div></div>
       <div class="presets" id="presets" role="group" aria-label="Snelle tijd"></div>
       <div class="stepper">
         <button type="button" class="stepbtn" id="minus" aria-label="15 minuten minder">−</button>
@@ -219,6 +234,10 @@ h2,h3{line-height:1.25}
         <button type="button" class="ghost" id="deleteBtn" hidden>Verwijderen</button>
       </div>
     </section>
+
+    <h2 class="listhead" id="dayListHead">Geboekt</h2>
+    <ul class="entries" id="dayEntries"></ul>
+    <p class="empty" id="dayEmpty"></p>
     <div class="quiet" id="dayNotice" hidden><span id="dayNoticeText"></span><button type="button" class="linkbtn" id="dayNoticeBtn"></button></div>
   </section>
 
@@ -270,9 +289,10 @@ h2,h3{line-height:1.25}
       <div class="notice" id="persistNotice" hidden>Deze browser bewaart niets: je gegevens verdwijnen als je de pagina sluit. Bewaar naar een bestand voordat je stopt.</div>
       <dl class="status" id="storageStatus"></dl>
       <div class="install" id="installBox" hidden></div>
-      <p><b>Bewaar naar bestand</b> zet alle uren als <code>uren-datum.json</code> in Bestanden (iPhone) of Drive, OneDrive of Downloads (Android). Dat bestand blijft staan als de app verwijderd wordt en is met <b>Bestand terugzetten</b> weer in te lezen, ook op een ander toestel. Op Android schrijft de app bij de eerste boeking van de dag zelf zo'n dagbestand naar Downloads.</p>
+      <p>Het <b>urenbestand</b> is één bestand op dit toestel (Android, Chrome) dat bij elke boeking wordt bijgewerkt. Het staat buiten de app-opslag en blijft dus bewaard als de app verwijderd wordt; op een nieuw toestel koppel je het gewoon opnieuw. Op iPhone kan dit niet: gebruik daar <b>Bewaar naar bestand</b> om een kopie in Bestanden te zetten.</p>
+      <div class="data-actions" id="fileActions" style="margin-bottom:10px"></div>
       <div class="data-actions">
-        <button type="button" class="primary small" id="fileBtn" style="flex:none">Bewaar naar bestand</button>
+        <button type="button" class="ghost small" id="fileBtn">Bewaar naar bestand</button>
         <label class="ghost small filebtn">Bestand terugzetten<input type="file" id="importJson" accept="application/json,.json" hidden></label>
       </div>
     </section>
@@ -390,19 +410,90 @@ h2,h3{line-height:1.25}
     });
     if (!storageInfo.persisted) ensurePersistent(true);
   }
-  // Android only: the first change of a day also writes uren-<datum>.json to Downloads, from within
-  // the tap that made the change, so the browser treats it as a normal download. iOS offers no
-  // equivalent; there the one-tap "Bewaar naar bestand" (share sheet) is the only route to a file.
-  const autoFileAvailable = () => isAndroid && !isIOS;
-  function save() {
+  // ---------- the linked file ----------
+  // Chrome on Android (132+) and on desktop expose the File System Access API: the user creates or
+  // picks ONE file once, we keep its handle in IndexedDB and write the complete state into that same
+  // file after every change. Safari (iPhone) does not have this; there the share sheet is the route.
+  const fsaAvailable = () => typeof window.showSaveFilePicker === 'function' && typeof window.showOpenFilePicker === 'function';
+  const FILE_TYPES = [{ description: 'Urenbestand', accept: { 'application/json': ['.json'] } }];
+  let fileHandle = null, fileError = null, fileBusy = false;
+  let writeChain = Promise.resolve();
+  const linkedName = () => (fileHandle && fileHandle.name) || state.linkedFileName || 'uren.json';
+
+  function save() { persist(); if (fileHandle) writeLinkedFile(); }
+
+  async function filePermission(request) {
+    if (!fileHandle) return false;
+    if (typeof fileHandle.queryPermission !== 'function') return true;
+    let p = await fileHandle.queryPermission({ mode: 'readwrite' });
+    if (p !== 'granted' && request) p = await fileHandle.requestPermission({ mode: 'readwrite' });
+    return p === 'granted';
+  }
+  // Called from inside the tap that made the change, so a permission prompt (at most once per
+  // session) is allowed. Writes are chained; each write stores the state as it is at that moment.
+  function writeLinkedFile() {
+    if (!fileHandle) return;
+    const perm = filePermission(true); perm.catch(() => {});
+    fileBusy = true;
+    writeChain = writeChain.then(async () => {
+      if (!(await perm)) throw Object.assign(new Error('permission'), { name: 'NotAllowedError' });
+      const w = await fileHandle.createWritable();
+      await w.write(fileJson()); await w.close();
+      fileError = null; markFileSaved(); persist();
+    }).catch(e => {
+      fileError = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'permission' : 'write';
+    }).then(() => { fileBusy = false; renderBanner(); renderDayNotice(); if (ui.view === 'types') renderTypes(); });
+  }
+  async function setHandle(h) {
+    fileHandle = h; fileError = null; state.linkedFileName = h.name;
+    try { await idbSet('fileHandle', h); } catch (e) {}
     persist();
-    if (autoFileAvailable() && (state.changesSinceFile || 0) > 0 && state.lastAutoFileDate !== today()) {
-      try {
-        download(fileName(), fileJson(), 'application/json');
-        state.lastAutoFileDate = today(); markFileSaved();
-        persist(); setTimeout(() => toast('Dagbestand opgeslagen in Downloads', 3000), 1300);
-      } catch (e) {}
-    }
+  }
+  async function unlinkFile() {
+    fileHandle = null; fileError = null; delete state.linkedFileName;
+    try { await idbSet('fileHandle', null); } catch (e) {}
+    persist(); renderAll();
+  }
+  // Adopt data from the file when it is newer than what this device has.
+  function adoptFileData(data, msg) {
+    if (!valid(data)) return false;
+    if ((data.savedAt || 0) <= (state.savedAt || 0)) return false;
+    const name = state.linkedFileName;
+    state = upgradeSeed(data); state.linkedFileName = name; state.changesSinceFile = 0;
+    resetDraft(); persist(); renderAll();
+    if (msg && state.entries.length) toast(msg, 3000);
+    return true;
+  }
+  async function createLinkedFile() {
+    try {
+      const h = await window.showSaveFilePicker({ suggestedName: 'uren.json', types: FILE_TYPES });
+      await setHandle(h); markChanged(); writeLinkedFile(); renderAll();
+      toast(`Urenbestand ${h.name} aangemaakt`, 3000);
+    } catch (e) { if (!e || e.name !== 'AbortError') toast('Bestand aanmaken is niet gelukt.', 3000); }
+  }
+  async function pickLinkedFile() {
+    try {
+      const [h] = await window.showOpenFilePicker({ types: FILE_TYPES, multiple: false });
+      let data = null;
+      try { data = JSON.parse(await (await h.getFile()).text()); } catch (e) {}
+      if (data !== null && !valid(data)) { toast('Dit bestand is geen urenbestand.', 3000); return; }
+      await setHandle(h);
+      const adopted = data ? adoptFileData(data) : false;
+      markChanged(); writeLinkedFile(); renderAll();
+      toast(adopted ? `Gekoppeld aan ${h.name}, ${plural(state.entries.length, 'boeking', 'boekingen')} hersteld` : `Gekoppeld aan ${h.name}`, 3500);
+    } catch (e) { if (!e || e.name !== 'AbortError') toast('Bestand kiezen is niet gelukt.', 3000); }
+  }
+  // At start: pick up the stored handle and, if we may read without asking, take newer data from it.
+  async function loadLinkedFile() {
+    if (!fsaAvailable()) return;
+    try { const h = await idbGet('fileHandle'); if (h) { fileHandle = h; state.linkedFileName = h.name; } } catch (e) {}
+    renderBanner(); renderDayNotice(); if (ui.view === 'types') renderTypes();
+    if (!fileHandle) return;
+    try {
+      if (!(await filePermission(false))) return;
+      const text = await (await fileHandle.getFile()).text();
+      if (text.trim()) adoptFileData(JSON.parse(text), `Uren hersteld uit ${fileHandle.name}`);
+    } catch (e) {}
   }
   const fileName = () => `uren-${today()}.json`;
   const fileJson = () => JSON.stringify(state, null, 2);
@@ -470,16 +561,18 @@ h2,h3{line-height:1.25}
     $('#dayTotal').textContent = fmtMin(sumMin(es));
     $('#dayCount').textContent = es.length ? plural(es.length, 'boeking', 'boekingen') : '';
     $('#dayEntries').innerHTML = es.map(entryHTML).join('');
+    $('#dayListHead').textContent = isToday ? 'Vandaag geboekt' : 'Geboekt op deze dag';
     const empty = $('#dayEmpty');
     empty.hidden = es.length > 0;
-    empty.textContent = isToday ? 'Nog niets geboekt vandaag. Kies hieronder een type, stel de tijd in en boek.' : 'Nog niets geboekt op deze dag. Kies hieronder een type, stel de tijd in en boek.';
+    empty.textContent = isToday ? 'Nog niets geboekt vandaag.' : 'Nog niets geboekt op deze dag.';
     renderBooking();
     renderDayNotice();
+    renderBanner();
   }
 
   function renderBooking() {
     const editing = !!ui.editingId;
-    $('#bookingTitle').textContent = editing ? 'Boeking bewerken' : 'Uren boeken';
+    $('#bookingTitle').hidden = !editing;
     let list = activeTypes();
     const cur = typeById(ui.draft.typeId);
     if (cur && cur.archived) list = [...list, cur];
@@ -487,6 +580,7 @@ h2,h3{line-height:1.25}
       ? list.map(t => `<button type="button" class="chip${t.id === ui.draft.typeId ? ' is-selected' : ''}" data-type="${t.id}" style="--c:${t.color}" role="radio" aria-checked="${t.id === ui.draft.typeId}"><span class="dot"></span>${esc(t.name)}</button>`).join('')
       : `<p class="hint">Nog geen types. Maak er eerst een aan onder <button type="button" class="linkbtn" data-goto="types">Types</button>.</p>`;
     syncDuration();
+    revealSelectedChip();
     $('#noteInput').value = ui.draft.note;
     $('#saveBtn').textContent = editing ? 'Opslaan' : 'Boeken';
     $('#cancelEdit').hidden = !editing;
@@ -583,10 +677,14 @@ h2,h3{line-height:1.25}
     $('#storageStatus').innerHTML =
       `<dt>Als app geïnstalleerd</dt>${standalone ? '<dd>Ja</dd>' : '<dd class="warn">Nee</dd>'}` +
       `<dt>Opslag beschermd</dt>${persisted}` +
-      `<dt>In bestand</dt>${unsavedCount() ? `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>` : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
-      `<dt>Laatste bestand</dt><dd>${state.fileSavedAt ? agoText(state.fileSavedAt) : 'Nog geen'}</dd>` +
-      `<dt>Dagbestand</dt><dd>${autoFileAvailable() ? 'Automatisch naar Downloads' : 'Niet mogelijk op dit toestel'}</dd>` +
+      `<dt>Urenbestand</dt>${!fsaAvailable() ? '<dd>Niet mogelijk in deze browser; gebruik Bewaar naar bestand</dd>' : !fileHandle ? '<dd class="warn">Nog niet aangemaakt</dd>' : fileError ? `<dd class="warn">${esc(linkedName())}, schrijven mislukt</dd>` : `<dd>${esc(linkedName())}, bijgewerkt bij elke boeking</dd>`}` +
+      `<dt>In bestand</dt>${unsavedCount() && !fileBusy ? `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>` : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
+      `<dt>Laatste keer</dt><dd>${state.fileSavedAt ? agoText(state.fileSavedAt) : 'Nog geen'}</dd>` +
       `<dt>Omvang</dt><dd>${plural(state.entries.length, 'boeking', 'boekingen')}, ${kb} kB</dd>`;
+    $('#fileActions').innerHTML = !fsaAvailable() ? '' : !fileHandle
+      ? '<button type="button" class="primary small" style="flex:none" data-file-action="create">Bestand aanmaken</button><button type="button" class="ghost small" data-file-action="pick">Bestaand bestand kiezen</button>'
+      : '<button type="button" class="ghost small" data-file-action="pick">Ander bestand koppelen</button><button type="button" class="ghost small" data-file-action="unlink">Loskoppelen</button>';
+    $('#fileBtn').textContent = fsaAvailable() && fileHandle ? 'Kopie delen' : 'Bewaar naar bestand';
     const box = $('#installBox');
     if (standalone) { box.hidden = true; box.innerHTML = ''; return; }
     box.hidden = false;
@@ -597,14 +695,35 @@ h2,h3{line-height:1.25}
   }
   function renderDayNotice() {
     const n = $('#dayNotice'), txt = $('#dayNoticeText'), btn = $('#dayNoticeBtn');
-    if (unsavedCount()) {
+    if (unsavedCount() && !fileHandle) {
       txt.textContent = `${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet in een bestand.`;
       btn.textContent = 'Bewaar naar bestand'; btn.dataset.action = 'file';
       n.classList.toggle('is-warn', unsavedSinceYesterday()); n.hidden = false; return;
     }
-    n.classList.remove('is-warn');
-    if (isHttp && !isStandalone()) { txt.textContent = 'Installeer Uren als app voor veilige opslag en offline gebruik.'; btn.textContent = 'Hoe?'; btn.dataset.action = 'install-help'; n.hidden = false; return; }
-    n.hidden = true;
+    n.classList.remove('is-warn'); n.hidden = true;
+  }
+  // The banner at the top of the day view walks a new device through: install, then the file.
+  function renderBanner() {
+    const b = $('#dayBanner'); if (!b) return;
+    const fsa = fsaAvailable(); let title = '', body = '', actions = '', err = false;
+    if (isHttp && !isStandalone() && !ui.bannerDismissed) {
+      title = 'Uren is nog niet geïnstalleerd als app';
+      body = fsa ? 'Installeer de app en maak daarna één keer het urenbestand aan op dit toestel. Dat bestand wordt bij elke boeking bijgewerkt en blijft staan als de app ooit verwijderd wordt.'
+        : isIOS ? 'Installeer via Delen → Zet op beginscherm, vóór je gaat boeken.' : 'Installeer via het menu van de browser (App installeren).';
+      actions = (installPrompt ? '<button type="button" class="primary small" id="installBtn">Installeren</button>' : '<button type="button" class="ghost small" data-goto="types">Hoe?</button>') +
+        '<button type="button" class="linkbtn" data-banner-dismiss>Later</button>';
+    } else if (fsa && !fileHandle) {
+      title = 'Maak het urenbestand aan';
+      body = 'Uren bewaart alles in één bestand op dit toestel, bijvoorbeeld in Downloads, en werkt dat bij elke boeking bij. Heb je al een uren.json van eerder? Kies dan dat bestand.';
+      actions = '<button type="button" class="primary small" data-file-action="create">Bestand aanmaken</button><button type="button" class="ghost small" data-file-action="pick">Bestaand bestand kiezen</button>';
+    } else if (fsa && fileHandle && fileError) {
+      err = true;
+      title = fileError === 'permission' ? `Geen toestemming voor ${linkedName()}` : `Kan niet schrijven naar ${linkedName()}`;
+      body = `${plural(unsavedCount(), 'boeking staat', 'boekingen staan')} nog niet in het bestand. ${fileError === 'permission' ? 'Tik op Opnieuw en sta het bewerken toe.' : 'Bestaat het bestand nog? Koppel anders een ander bestand.'}`;
+      actions = '<button type="button" class="primary small" data-file-action="retry">Opnieuw</button><button type="button" class="ghost small" data-file-action="pick">Ander bestand</button>';
+    } else { b.hidden = true; return; }
+    b.hidden = false; b.classList.toggle('is-error', err);
+    $('#bannerTitle').textContent = title; $('#bannerBody').textContent = body; $('#bannerActions').innerHTML = actions;
   }
 
   function renderAll() { renderDay(); renderList(); renderTypes(); }
@@ -639,14 +758,16 @@ h2,h3{line-height:1.25}
     if (ui.editingId) {
       const e = state.entries.find(x => x.id === ui.editingId);
       if (e) { e.typeId = d.typeId; e.minutes = d.minutes; e.note = note; }
-      ui.editingId = null; markChanged(); toast('Boeking opgeslagen');
+      ui.editingId = null; markChanged();
+      save(); toast('Boeking opgeslagen');
     } else {
       state.entries.push({ id: uid(), date: ui.date, typeId: d.typeId, minutes: d.minutes, note, created: Date.now() });
       markChanged();
+      save();
       toast(`${fmtMin(d.minutes)} geboekt op ${(typeById(d.typeId) || UNKNOWN).name}`);
     }
     ui.confirmDelete = false; ui.draft.note = '';
-    save(); renderDay();
+    renderDay();
   }
   function deleteEntry() {
     if (!ui.editingId) return;
@@ -658,6 +779,21 @@ h2,h3{line-height:1.25}
   }
 
   const PRESETS = [15, 30, 45, 60];
+  function revealSelectedChip() {
+    const strip = $('#typeChips'), sel = strip.querySelector('.chip.is-selected');
+    if (sel && strip.clientWidth) {
+      const left = Math.max(0, sel.offsetLeft - 16), right = sel.offsetLeft + sel.offsetWidth + 16;
+      let target = null;
+      if (left < strip.scrollLeft) target = left;
+      else if (right > strip.scrollLeft + strip.clientWidth) target = right - strip.clientWidth;
+      if (target !== null) { if (typeof strip.scrollTo === 'function') strip.scrollTo({ left: target, behavior: reduced ? 'auto' : 'smooth' }); else strip.scrollLeft = target; }
+    }
+    updateStripFade();
+  }
+  function updateStripFade() {
+    const strip = $('#typeChips'), wrap = $('#typeStrip');
+    wrap.classList.toggle('at-end', strip.scrollWidth - strip.clientWidth - strip.scrollLeft < 8);
+  }
   function syncDuration() {
     const m = ui.draft.minutes;
     $('#durationOut').textContent = fmtMin(m);
@@ -702,14 +838,25 @@ h2,h3{line-height:1.25}
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
-  function exportCsv() {
+  // Phones: hand the file to the share sheet (Bestanden, OneDrive, mail). Elsewhere: download.
+  // On an iPhone home-screen app a plain download is unreliable; the share sheet is not.
+  async function shareOrDownload(name, text, mime) {
+    if (navigator.share && navigator.canShare && typeof File === 'function') {
+      try {
+        const file = new File([text], name, { type: mime });
+        if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return 'shared'; }
+      } catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; }
+    }
+    download(name, text, mime); return 'downloaded';
+  }
+  async function exportCsv() {
     const [from, to] = listRange();
     const all = ui.typeFilter.size === 0;
     const rows = state.entries.filter(e => e.date >= from && e.date <= to && (all || ui.typeFilter.has(e.typeId)))
       .sort((a, b) => a.date.localeCompare(b.date) || a.created - b.created);
     const q = v => /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
     const lines = ['Datum;Type;Notitie;Minuten;Uren', ...rows.map(e => [e.date, (typeById(e.typeId) || UNKNOWN).name, e.note || '', e.minutes, fmtDec(e.minutes)].map(v => q(String(v))).join(';'))];
-    download(`uren_${from}_${to}.csv`, '\uFEFF' + lines.join('\r\n'), 'text/csv;charset=utf-8');
+    await shareOrDownload(`uren_${from}_${to}.csv`, '\uFEFF' + lines.join('\r\n'), 'text/csv;charset=utf-8');
   }
 
   // ---------- events ----------
@@ -718,6 +865,13 @@ h2,h3{line-height:1.25}
     const d = b.dataset;
     if (d.view) return setView(d.view);
     if (d.goto) return setView(d.goto);
+    if (d.fileAction) {
+      if (d.fileAction === 'create') return createLinkedFile();
+      if (d.fileAction === 'pick') return pickLinkedFile();
+      if (d.fileAction === 'unlink') return unlinkFile();
+      if (d.fileAction === 'retry') { fileError = null; writeLinkedFile(); return renderBanner(); }
+    }
+    if ('bannerDismiss' in d) { ui.bannerDismissed = true; return renderBanner(); }
     if (d.edit) {
       const e = state.entries.find(x => x.id === d.edit); if (!e) return;
       if (ui.view !== 'day') { ui.date = e.date; setView('day'); }
@@ -767,6 +921,8 @@ h2,h3{line-height:1.25}
     if (ev.target.id === 'editTypeName') { ev.preventDefault(); const b = document.querySelector('[data-save-type]'); if (b) b.click(); }
   });
 
+  $('#typeChips').addEventListener('scroll', updateStripFade, { passive: true });
+  window.addEventListener('resize', updateStripFade);
   $('#prevDay').addEventListener('click', () => setDate(addDays(ui.date, -1)));
   $('#nextDay').addEventListener('click', () => setDate(addDays(ui.date, 1)));
   $('#goToday').addEventListener('click', () => setDate(today()));
@@ -782,15 +938,8 @@ h2,h3{line-height:1.25}
   $('#exportCsv').addEventListener('click', exportCsv);
   $('#addTypeBtn').addEventListener('click', addType);
   async function saveToFile() {
-    const name = fileName(), json = fileJson();
-    let done = false;
-    if (navigator.share && navigator.canShare && typeof File === 'function') {
-      try {
-        const file = new File([json], name, { type: 'application/json' });
-        if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Uren' }); done = true; }
-      } catch (e) { if (e && e.name === 'AbortError') return; }
-    }
-    if (!done) download(name, json, 'application/json');
+    const result = await shareOrDownload(fileName(), fileJson(), 'application/json');
+    if (result === 'cancelled') return;
     markFileSaved(); persist(); renderAll(); toast('Bestand bewaard');
   }
   $('#fileBtn').addEventListener('click', saveToFile);
@@ -802,7 +951,7 @@ h2,h3{line-height:1.25}
 
   // install prompt (Android/desktop Chrome and Edge fire this; iOS never does)
   let installPrompt = null;
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; if (ui.view === 'types') renderTypes(); });
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; renderBanner(); if (ui.view === 'types') renderTypes(); });
   window.addEventListener('appinstalled', () => { installPrompt = null; toast('Uren staat nu als app op je toestel'); ensurePersistent(true); renderAll(); });
   document.addEventListener('click', async ev => {
     if (!ev.target.closest('#installBtn') || !installPrompt) return;
@@ -839,7 +988,7 @@ h2,h3{line-height:1.25}
   renderAll();
   setView('day');
   ensurePersistent(false);
-  restoreFromMirror();
+  restoreFromMirror().then(loadLinkedFile);
   if (!storageInfo.local) toast('Let op: deze browser bewaart mogelijk niets. Maak een backup via Types.', 4000);
 })();
 </script>

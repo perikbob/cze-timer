@@ -1,5 +1,5 @@
 // Uren – service worker. Bump VERSION when you change any of the ASSETS.
-const VERSION = 'uren-2026-09-15d';
+const VERSION = 'uren-2026-09-15e';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './fonts/InstrumentSans.woff2',

@@ -1,6 +1,6 @@
 # Uren
 
-Uren is een kleine app voor je telefoon waarmee je bijhoudt hoeveel tijd je per dag aan welk soort werk besteedt. Hij is gemaakt voor een pilot van drie maanden in het ziekenhuis. Je uren blijven op je eigen telefoon; er is geen server en geen inlog.
+Uren is een kleine app voor je telefoon waarmee je bijhoudt hoeveel tijd je per dag aan welk soort werk besteedt. Je uren blijven op je eigen telefoon; er is geen server en geen inlog.
 
 ## Wat kun je ermee
 
@@ -43,16 +43,3 @@ Alles hierover staat onder het tandwiel rechtsboven, bij *Gegevens en opslag*.
 ## Nieuwe versie
 
 Komt er een nieuwe versie, dan zie je eenmalig *Nieuwe versie klaar*. Sluit de app helemaal en open hem opnieuw. Je uren blijven staan.
-
-## Voor de beheerder
-
-- De map hoort in zijn geheel op een **https**-adres te staan (bijvoorbeeld GitHub Pages: repository, Settings → Pages, branch `main`, map `/`). Installeren en offline gebruik werken niet vanaf een los bestand of gewoon http.
-- Nieuwe versie uitrollen: vervang de bestanden, verhoog `APP_VERSION` in `index.html` en `VERSION` in `sw.js`.
-- Chrome op Android onthoudt de toestemming voor het urenbestand niet tussen starts, ook niet als geïnstalleerde app. De app vraagt het daarom hoogstens één keer per start en alleen als het bestand ouder is dan een dag; jongere boekingen wachten in de app-opslag tot de volgende boeking of *Nu bijwerken*.
-- Het urenbestand bevat de complete stand als JSON: boekingen met tijdstempels (`created`, `updated`), typen, en de versie waarmee het is weggeschreven. De CSV-export heeft de kolommen Datum, Type, Notitie, Minuten, Uren, Aangemaakt en Gewijzigd.
-- Technische documentatie voor ontwikkelaars staat in `CLAUDE.md`.
-
-## Beperkingen van deze pilotversie
-
-- Geen synchronisatie tussen telefoons; overstappen gaat via het urenbestand of een backup.
-- Alles staat onversleuteld op de telefoon. Voor gebruik na de pilot hoort hier een backend met inlog en centrale opslag achter.

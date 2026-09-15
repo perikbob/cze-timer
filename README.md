@@ -26,7 +26,7 @@ Deel daarna het adres van `index.html`.
 ## Boeken en timer
 
 - Handmatig: type kiezen, tijd via 15/30/45/60 of − en +, Boeken. Er is geen standaardtype: elke boeking is een bewuste keuze.
-- Timer: de ronde knop bovenin het boekpaneel. Type eerst kiezen en dan starten, of starten en het type bij het stoppen kiezen (of tussendoor aantikken). Stoppen rondt af op het dichtstbijzijnde kwartier, minimaal 0:15, en boekt direct als er een type gekozen is. De timer loopt door als de app gesloten wordt.
+- Timer: de ronde knop bovenin het boekpaneel. Type eerst kiezen en dan starten, of starten en het type bij het stoppen kiezen (of tussendoor aantikken). Stoppen rondt de gelopen tijd naar boven af op hele minuten en daarna naar boven op het kwartier (minimaal 0:15, maximaal 24:00), en boekt direct als er een type gekozen is. De timer loopt door als de app gesloten wordt.
 
 ## 3. Waar de uren staan
 

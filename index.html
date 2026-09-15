@@ -323,7 +323,7 @@ h2,h3{line-height:1.25}
   const KEY = 'uren-poc-v1';
   const STEP = 15;
   const MAX_MIN = 24 * 60;
-  const PALETTE = ['#0F6E5C','#2A8FA3','#2F6BB0','#6A5BC2','#9C4F9E','#B04B7E','#B0463E','#C8742A','#9C8420','#5E8B2F','#6E7F82'];
+  const PALETTE = ['#0F6E5C','#2A8FA3','#2F6BB0','#6A5BC2','#9C4F9E','#B04B7E','#B0463E','#C8742A','#9C8420','#5E8B2F','#6E7F82','#8C5A2B','#5C6BC0','#00838F','#AD1457','#B58900'];
   const UNKNOWN = { name: 'Onbekend type', color: '#9AA7A9' };
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -352,12 +352,12 @@ h2,h3{line-height:1.25}
   const valid = s => !!s && Array.isArray(s.types) && Array.isArray(s.entries);
   const isHttp = location.protocol === 'https:' || location.protocol === 'http:';
   const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const isAndroid = /Android/i.test(navigator.userAgent);
   const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 
-  const SEED_VERSION = 2;
+  const SEED_VERSION = 3;
   const DEFAULT_TYPES = [
     'Direct patiëntencontact',
+    'Supervisie opleiding tbv direct patiëntcontact',
     'Administratie patiënten',
     'E-mail over patiënten',
     'E-mail opleidingsgerelateerd',
@@ -367,16 +367,31 @@ h2,h3{line-height:1.25}
     'MDO niet-patiëntenzorg',
     'Opleidingstaken',
     'Managementtaken',
+    'Eigen vorming/opleiding',
+    'Thuiswerk administratie (buiten contract)',
+    'Thuiswerk management (buiten contract)',
+    'Thuiswerk opleiding (buiten contract)',
     'Overig',
   ];
   const defaultTypes = () => DEFAULT_TYPES.map((name, i) => ({ id: uid(), name, color: PALETTE[i % PALETTE.length], archived: false }));
   function seed() { return { version: 1, seedVersion: SEED_VERSION, entries: [], types: defaultTypes() }; }
-  // An earlier build shipped four placeholder types. If those are still the only types and nothing
-  // has been booked yet, swap them for the current set.
+  // Seed migrations, run on every load of stored data (local, mirror, linked file, backup).
+  // v2: an earlier build shipped four placeholder types; if those are still the only types and
+  //     nothing has been booked yet, swap them for the current set.
+  // v3: five types were added to the defaults; give an existing install the ones it lacks (matched
+  //     by name, archived counts as present), inserted before 'Overig'. User-made types are untouched.
   const OLD_DEFAULTS = ['Cliëntcontact', 'Rapportage', 'Overleg', 'Reistijd'];
   function upgradeSeed(s) {
-    if (s.seedVersion === SEED_VERSION) return s;
-    if (s.entries.length === 0 && s.types.every(t => OLD_DEFAULTS.includes(t.name))) s.types = defaultTypes();
+    const from = s.seedVersion || 1;
+    if (from >= SEED_VERSION) return s;
+    if (from < 2 && s.entries.length === 0 && s.types.every(t => OLD_DEFAULTS.includes(t.name))) s.types = defaultTypes();
+    if (from < 3) {
+      const have = new Set(s.types.map(t => t.name.trim().toLowerCase()));
+      const missing = DEFAULT_TYPES.filter(n => !have.has(n.toLowerCase()));
+      const added = missing.map((name, i) => ({ id: uid(), name, color: PALETTE[(s.types.length + i) % PALETTE.length], archived: false }));
+      const at = s.types.findIndex(t => t.name === 'Overig' && !t.archived);
+      s.types.splice(at < 0 ? s.types.length : at, 0, ...added);
+    }
     s.seedVersion = SEED_VERSION;
     return s;
   }
@@ -799,10 +814,10 @@ h2,h3{line-height:1.25}
 
   const PRESETS = [15, 30, 45, 60];
   // ---------- timer ----------
-  // One running timer, kept in state so it survives closing the app. Stop rounds to the nearest
-  // quarter (minimum 0:15). With a type chosen it books at once; without, it fills in the duration
-  // and waits for a type.
-  const roundQuarter = ms => Math.max(STEP, Math.round(ms / 60000 / STEP) * STEP);
+  // One running timer, kept in state so it survives closing the app. Stop rounds the elapsed time up
+  // to whole minutes and then up to the next quarter (minimum 0:15, capped at 24:00). With a type
+  // chosen it books at once; without, it fills in the duration and waits for a type.
+  const roundQuarter = ms => Math.min(MAX_MIN, Math.max(STEP, Math.ceil(Math.ceil(ms / 60000) / STEP) * STEP));
   const fmtElapsed = ms => { const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60; return (h ? h + ':' + pad(m) : String(m)) + ':' + pad(s % 60); };
   let timerTick = null;
   function startTimer() {
@@ -1042,14 +1057,19 @@ h2,h3{line-height:1.25}
       });
     }).catch(() => {});
   }
+  // Restoring a backup is an explicit choice: the file replaces what is on this device, whichever is
+  // newer. Device-bound fields (running timer, linked file, iOS notice) are kept, seed migrations run,
+  // and a linked file is rewritten so it matches again.
   $('#importJson').addEventListener('change', async ev => {
     const f = ev.target.files && ev.target.files[0]; if (!f) return;
     try {
       const s = JSON.parse(await f.text());
-      if (!s || !Array.isArray(s.types) || !Array.isArray(s.entries)) throw new Error('shape');
-      state = { version: 1, types: s.types, entries: s.entries };
+      if (!valid(s)) throw new Error('shape');
+      const { timer, linkedFileName, iosNoticeSeen } = state;
+      state = upgradeSeed({ version: 1, seedVersion: s.seedVersion, types: s.types, entries: s.entries, timer, linkedFileName, iosNoticeSeen });
       ui.editingId = null; ui.editType = null; ui.typeFilter.clear(); ui.draft.typeId = null; resetDraft();
-      markFileSaved(); persist(); renderAll(); toast('Bestand teruggezet');
+      if (fileHandle) { markChanged(); save(); } else { markFileSaved(); persist(); }
+      renderAll(); toast('Bestand teruggezet');
     } catch (e) { toast('Dit bestand is geen geldige backup.'); }
     ev.target.value = '';
   });

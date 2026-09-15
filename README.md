@@ -1,64 +1,58 @@
-# Uren – PWA
+# Uren
 
-Bestanden in deze map horen bij elkaar en moeten samen online staan:
+Uren is een kleine app voor je telefoon waarmee je bijhoudt hoeveel tijd je per dag aan welk soort werk besteedt. Hij is gemaakt voor een pilot van drie maanden in het ziekenhuis. Je uren blijven op je eigen telefoon; er is geen server en geen inlog.
 
-- `index.html` – de app
-- `manifest.webmanifest` – naam, icoon en weergave als app
-- `sw.js` – service worker voor offline gebruik
-- `fonts/`, `icons/` – lettertype, app-iconen en `logo.png` (lokaal, geen externe verzoeken)
+## Wat kun je ermee
 
-## 1. Online zetten
+- **Boeken.** Kies een type (bijvoorbeeld *Direct patiëntencontact* of *MDO patiëntenzorg*), kies een tijd via 15/30/45/60 of de knoppen − en +, en tik op *Boeken*. Tijd gaat in stappen van een kwartier.
+- **Timer.** Tik op de ronde knop bovenin het boekpaneel. Kies het type vooraf, tussendoor of bij het stoppen. Bij stoppen wordt de gelopen tijd naar boven afgerond op het volgende kwartier en direct geboekt. De timer loopt door als je de app sluit.
+- **Terugkijken.** Blader per dag met de pijlen, of open *Lijst* voor 7, 30 of 90 dagen met totalen per type. Daar kun je ook een CSV-bestand voor Excel maken.
+- **Bewerken.** Tik op een boeking om de tijd of het type aan te passen, of om hem te verwijderen.
+- **Offline.** Na de eerste keer openen werkt de app ook zonder internet.
 
-Installeren als app en offline gebruik werken alleen vanaf een **https**-adres; vanuit een los bestand niet.
-Zet de hele map als statische website online, bijvoorbeeld:
+De typen zijn voor iedereen gelijk en worden centraal beheerd. Mis je er een, meld dat bij de beheerder van de pilot.
 
-- **GitHub Pages** – repository aanmaken, map uploaden, Settings → Pages → branch `main`, map `/`.
-- **Azure Static Web Apps** – past bij een Microsoft-omgeving; met Entra ID-login beperk je de toegang tot eigen accounts.
-- Elke andere statische host (Netlify, Cloudflare Pages, interne webserver).
+## Installeren
 
-Deel daarna het adres van `index.html`.
+Installeer Uren als app op je startscherm en gebruik daarna altijd dat icoon. Dat is belangrijk: de app op het startscherm heeft eigen opslag, en de browser ruimt die niet zomaar op.
 
-## 2. Installeren op de telefoon
+**Android (Chrome)**
 
-- **iPhone/iPad**: open het adres in Safari → Delen → *Zet op beginscherm*. Doe dit vóór je gaat boeken: de app op het beginscherm heeft eigen opslag, wat je in Safari boekt komt daar niet in (of: backup maken in Safari, terugzetten in de app).
-- **Android**: Chrome biedt *Installeren* / *Toevoegen aan startscherm* aan, of gebruik de knop onder Instellingen (tandwiel) → Gegevens en opslag.
+1. Open het adres van Uren in Chrome.
+2. Tik in de blauwe balk bovenaan op *Installeren*, of via het menu ⋮ op *App installeren* / *Toevoegen aan startscherm*.
+3. Open Uren vanaf het startscherm. Bovenaan staat *Maak het urenbestand aan*: tik op *Bestand aanmaken*, kies de map Downloads en laat de naam `uren.json` staan. Zie hieronder waarom.
 
-## Boeken en timer
+**iPhone (Safari)**
 
-- Handmatig: type kiezen, tijd via 15/30/45/60 of − en +, Boeken. Er is geen standaardtype: elke boeking is een bewuste keuze.
-- Timer: de ronde knop bovenin het boekpaneel. Type eerst kiezen en dan starten, of starten en het type bij het stoppen kiezen (of tussendoor aantikken). Stoppen rondt de gelopen tijd naar boven af op hele minuten en daarna naar boven op het kwartier (minimaal 0:15, maximaal 24:00), en boekt direct als er een type gekozen is. De timer loopt door als de app gesloten wordt.
+1. Open het adres van Uren in Safari.
+2. Tik op *Delen* en kies *Zet op beginscherm*.
+3. Open Uren vanaf het beginscherm. Doe dit vóór je gaat boeken: wat je in Safari zelf boekt komt niet in de app terecht.
 
-## 3. Waar de uren staan
+Een uitgebreide handleiding met stappen per telefoon staat in `handleiding.html` op hetzelfde adres.
 
-- Op het toestel zelf, niet op een server. Twee kopieën: localStorage en een IndexedDB-spiegel; bij het starten wint de nieuwste, dus het wegvallen van één kopie kost geen uren.
-- Als geïnstalleerde app ruimt de browser de opslag niet automatisch op. In gewoon Safari wordt opslag van sites die 7 dagen niet gebruikt zijn wél gewist; de app op het beginscherm valt daar buiten. Op Android vraagt de app *persistent storage* aan; het paneel Gegevens en opslag laat zien of dat gelukt is.
-- Wat de opslag op het toestel wél verwijdert: de app verwijderen, op iOS *Wis geschiedenis en websitegegevens*, op Android de sitegegevens van het domein wissen, of een kwijtgeraakt toestel. Daartegen beschermt alleen een bestand buiten de app-opslag.
+## Waar je uren staan
 
-### Het urenbestand (Android)
+Je uren staan op je telefoon, in de opslag van de app. Ze verdwijnen alleen als je de app verwijdert, de websitegegevens wist, of een andere telefoon krijgt. Daarom is er een kopie buiten de app:
 
-- Chrome op Android (versie 132 en nieuwer, januari 2025) laat een webapp één bestand aanmaken of kiezen en daarna steeds opnieuw beschrijven. Uren gebruikt dat: bij de eerste start vraagt een balk bovenaan om **Bestand aanmaken** (kies bijvoorbeeld Downloads, naam `uren.json`). Daarna schrijft de app na elke boeking, wijziging of verwijdering de complete stand in datzelfde bestand. Geen nieuwe bestanden, geen downloadmeldingen.
-- Chrome kan bij de eerste boeking na het openen van de app één keer vragen of Uren het bestand mag bewerken; sta dat toe.
-- Het bestand staat buiten de app-opslag. Wordt de app verwijderd of komt er een nieuw toestel, dan kies je bij de eerste start **Bestaand bestand kiezen**, wijst `uren.json` aan en alles staat er weer.
-- Lukt het schrijven niet (bestand verwijderd, toestemming geweigerd), dan wordt de balk bovenaan rood met het aantal boekingen dat nog niet in het bestand staat, en een knop om het opnieuw te proberen of een ander bestand te koppelen. De uren zelf staan intussen gewoon in de app-opslag.
-- Onder Instellingen (tandwiel) → Gegevens en opslag zie je welk bestand gekoppeld is, en kun je een ander bestand koppelen of loskoppelen.
+- **Android: het urenbestand.** Eén bestand `uren.json`, bijvoorbeeld in Downloads, dat de app zelf bijwerkt. Chrome vraagt daarvoor ongeveer één keer per dag toestemming; sta dat toe. Boekingen die nog niet in het bestand staan zie je onder de dag, met een knop *Nu bijwerken*. Verwijder je de app of krijg je een nieuwe telefoon, dan kies je bij de eerste start *Bestaand bestand kiezen* en staat alles er weer.
+- **iPhone: Bewaar naar bestand.** Een iPhone laat de app geen bestand bijhouden. Tik daarom regelmatig, bijvoorbeeld aan het eind van elke werkdag, op *Bewaar naar bestand* en kies *Bewaar in Bestanden*, steeds in dezelfde map (OneDrive of iCloud Drive). Het bestand heet altijd `uren.json`; tik op *Vervangen* als iOS dat vraagt. De app telt hoeveel boekingen nog niet bewaard zijn. *Bestand terugzetten* leest het bestand weer in.
+- **Kopieën op de telefoon.** Elke dag bewaart de app zelf een kopie van je boekingen, twee weken lang. Onder het tandwiel kun je die terugzetten als je per ongeluk iets verkeerd hebt gedaan.
 
-### iPhone
+Alles hierover staat onder het tandwiel rechtsboven, bij *Gegevens en opslag*.
 
-Safari heeft deze mogelijkheid niet en Apple heeft aangegeven die niet te gaan bouwen. Op iPhone is **Bewaar naar bestand** (deelmenu → Bewaar in Bestanden) de weg naar een kopie buiten de app; de app telt hoeveel boekingen nog niet in een bestand staan en toont dat onder het boekpaneel. Het bestand heet altijd `uren.json`: kies steeds dezelfde map (bijvoorbeeld OneDrive of iCloud Drive in Bestanden) en tik op *Vervangen* als iOS dat vraagt, dan is er één bestand dat altijd de laatste stand bevat. **Bestand terugzetten** leest zo'n bestand weer in.
+## Nieuwe versie
 
-### Kopieën op het toestel
+Komt er een nieuwe versie, dan zie je eenmalig *Nieuwe versie klaar*. Sluit de app helemaal en open hem opnieuw. Je uren blijven staan.
 
-Elke dag bij de eerste start, en vóór elk terugzetten, bewaart de app een kopie van de boekingen en types in IndexedDB, twee weken lang. Onder Instellingen (tandwiel) → Gegevens en opslag staan ze met een knop *Terugzetten*. Dit is een ongedaan-maken voor vergissingen (verkeerde bewerking, verkeerd bestand teruggezet), geen bescherming tegen verlies van het toestel.
+## Voor de beheerder
 
-### Het bestand
+- De map hoort in zijn geheel op een **https**-adres te staan (bijvoorbeeld GitHub Pages: repository, Settings → Pages, branch `main`, map `/`). Installeren en offline gebruik werken niet vanaf een los bestand of gewoon http.
+- Nieuwe versie uitrollen: vervang de bestanden, verhoog `APP_VERSION` in `index.html` en `VERSION` in `sw.js`.
+- Chrome op Android onthoudt de toestemming voor het urenbestand niet tussen starts, ook niet als geïnstalleerde app. De app vraagt het daarom hoogstens één keer per start en alleen als het bestand ouder is dan een dag; jongere boekingen wachten in de app-opslag tot de volgende boeking of *Nu bijwerken*.
+- Het urenbestand bevat de complete stand als JSON: boekingen met tijdstempels (`created`, `updated`), typen, en de versie waarmee het is weggeschreven. De CSV-export heeft de kolommen Datum, Type, Notitie, Minuten, Uren, Aangemaakt en Gewijzigd.
+- Technische documentatie voor ontwikkelaars staat in `CLAUDE.md`.
 
-`uren.json` bevat de complete stand: `entries` (boekingen met `created` en, na bewerking, `updated` als tijdstempel), `types` (met `created`/`updated`), `savedAt`, en `exportedAt` plus de app-versie waarmee het is weggeschreven. De CSV-export bevat per boeking ook de kolommen *Aangemaakt* en *Gewijzigd*.
+## Beperkingen van deze pilotversie
 
-## 4. Nieuwe versie uitrollen
-
-Vervang `index.html` (en eventueel de andere bestanden). Verhoog `APP_VERSION` in `index.html` (zichtbaar onder Gegevens en opslag en in het urenbestand) en `VERSION` in `sw.js`. Gebruikers zien *Nieuwe versie klaar* en krijgen de nieuwe versie bij de volgende start van de app.
-
-## Beperkingen van deze PoC
-
-- Geen synchronisatie tussen toestellen; overstappen gaat via backup.
-- Notities kunnen persoonsgegevens bevatten en staan onversleuteld op het toestel. Voor productie hoort hier een backend met inlog en centrale opslag achter.
+- Geen synchronisatie tussen telefoons; overstappen gaat via het urenbestand of een backup.
+- Alles staat onversleuteld op de telefoon. Voor gebruik na de pilot hoort hier een backend met inlog en centrale opslag achter.

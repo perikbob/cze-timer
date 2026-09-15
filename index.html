@@ -321,7 +321,7 @@ h2,h3{line-height:1.25}
   const KEY = 'uren-poc-v1';
   const STEP = 15;
   const MAX_MIN = 24 * 60;
-  const APP_VERSION = '1.3';
+  const APP_VERSION = '2.0';
   const SNAP_DAYS = 14;
   const PALETTE = ['#0F6E5C','#2A8FA3','#2F6BB0','#6A5BC2','#9C4F9E','#B04B7E','#B0463E','#C8742A','#9C8420','#5E8B2F','#6E7F82','#8C5A2B','#5C6BC0','#00838F','#AD1457','#B58900'];
   const UNKNOWN = { name: 'Onbekend type', color: '#9AA7A9' };
@@ -458,6 +458,12 @@ h2,h3{line-height:1.25}
   const FILE_TYPES = [{ description: 'Urenbestand', accept: { 'application/json': ['.json'] } }];
   let fileHandle = null, fileError = null, fileBusy = false;
   let writeChain = Promise.resolve();
+  // Chrome on Android asks for edit permission on a stored handle at every page load, installed app or
+  // not. To keep that bearable the app asks on its own at most once per load, and only when the file
+  // is older than FILE_MAX_AGE; younger than that, writes are deferred (hours stay in app storage) until
+  // a later booking, or until the user taps Nu bijwerken. Once granted in a load, every write is free.
+  const FILE_MAX_AGE = 24 * 60 * 60 * 1000;
+  let permAsked = false, fileDeferred = false;
   const linkedName = () => (fileHandle && fileHandle.name) || state.linkedFileName || 'uren.json';
 
   function save() { persist(); if (fileHandle) writeLinkedFile(); }
@@ -469,17 +475,27 @@ h2,h3{line-height:1.25}
     if (p !== 'granted' && request) p = await fileHandle.requestPermission({ mode: 'readwrite' });
     return p === 'granted';
   }
-  // Called from inside the tap that made the change, so a permission prompt (at most once per
-  // session) is allowed. Writes are chained; each write stores the state as it is at that moment.
-  function writeLinkedFile() {
+  // Called from inside the tap that made the change, so a permission prompt is allowed (the decision
+  // and the request start synchronously here, before any awaited write). force = the user asked for
+  // it (Opnieuw, Nu bijwerken). Writes are chained; each write stores the state as it is at that moment.
+  function writeLinkedFile(force) {
     if (!fileHandle) return;
-    const perm = filePermission(true); perm.catch(() => {});
+    const fresh = Date.now() - (state.fileSavedAt || 0) < FILE_MAX_AGE;
+    const mayAsk = force || (!permAsked && !fresh);
+    const perm = (async () => {
+      if (await filePermission(false)) return true;
+      if (!mayAsk) return null;
+      permAsked = true;
+      return filePermission(true);
+    })(); perm.catch(() => {});
     fileBusy = true;
     writeChain = writeChain.then(async () => {
-      if (!(await perm)) throw Object.assign(new Error('permission'), { name: 'NotAllowedError' });
+      const granted = await perm;
+      if (granted === null) { fileDeferred = true; return; }
+      if (!granted) throw Object.assign(new Error('permission'), { name: 'NotAllowedError' });
       const w = await fileHandle.createWritable();
       await w.write(fileJson()); await w.close();
-      fileError = null; markFileSaved(); persist();
+      fileError = null; fileDeferred = false; markFileSaved(); persist();
     }).catch(e => {
       fileError = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'permission' : 'write';
     }).then(() => { fileBusy = false; renderBanner(); renderDayNotice(); if (ui.view === 'settings') renderSettings(); });
@@ -735,7 +751,7 @@ h2,h3{line-height:1.25}
       `<dt>Als app geïnstalleerd</dt>${standalone ? '<dd>Ja</dd>' : '<dd class="warn">Nee</dd>'}` +
       `<dt>Opslag beschermd</dt>${persisted}` +
       `<dt>Urenbestand</dt>${!fsaAvailable() ? (isIOS ? '<dd>Niet mogelijk op iPhone; gebruik Bewaar naar bestand</dd>' : '<dd>Niet mogelijk in deze browser; gebruik Bewaar naar bestand</dd>') : !fileHandle ? '<dd class="warn">Nog niet aangemaakt</dd>' : fileError ? `<dd class="warn">${esc(linkedName())}, schrijven mislukt</dd>` : `<dd>${esc(linkedName())}, bijgewerkt bij elke boeking</dd>`}` +
-      `<dt>In bestand</dt>${unsavedCount() && !fileBusy ? `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>` : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
+      `<dt>In bestand</dt>${unsavedCount() && !fileBusy ? (fileHandle && fileDeferred && !fileError ? `<dd>${plural(unsavedCount(), 'boeking volgt', 'boekingen volgen')} bij een volgende boeking</dd>` : `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>`) : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
       `<dt>Laatste keer</dt><dd>${state.fileSavedAt ? agoText(state.fileSavedAt) : 'Nog geen'}</dd>` +
       `<dt>Omvang</dt><dd>${plural(state.entries.length, 'boeking', 'boekingen')}, ${kb} kB</dd>` +
       `<dt>Versie</dt><dd>${APP_VERSION}</dd>`;
@@ -763,6 +779,11 @@ h2,h3{line-height:1.25}
       btn.textContent = 'Bewaar naar bestand'; btn.dataset.action = 'file';
       n.classList.toggle('is-warn', unsavedSinceYesterday()); n.hidden = false; return;
     }
+    if (fileHandle && fileDeferred && unsavedCount() && !fileError && !fileBusy) {
+      txt.textContent = `${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet in ${linkedName()}; volgt bij een volgende boeking.`;
+      btn.textContent = 'Nu bijwerken'; btn.dataset.action = 'filenow';
+      n.classList.remove('is-warn'); n.hidden = false; return;
+    }
     n.classList.remove('is-warn'); n.hidden = true;
   }
   // The banner at the top of the day view walks a new device through: install, then the file.
@@ -783,7 +804,7 @@ h2,h3{line-height:1.25}
     } else if (fsa && fileHandle && fileError) {
       err = true;
       title = fileError === 'permission' ? `Geen toestemming voor ${linkedName()}` : `Kan niet schrijven naar ${linkedName()}`;
-      body = `${plural(unsavedCount(), 'boeking staat', 'boekingen staan')} nog niet in het bestand. ${fileError === 'permission' ? 'Tik op Opnieuw en sta het bewerken toe.' : 'Bestaat het bestand nog? Koppel anders een ander bestand.'}`;
+      body = `${plural(unsavedCount(), 'boeking staat', 'boekingen staan')} nog niet in het bestand. ${fileError === 'permission' ? 'Tik op Opnieuw en sta het bewerken toe. Chrome vraagt dit hoogstens één keer per start; de uren staan intussen veilig in de app.' : 'Bestaat het bestand nog? Koppel anders een ander bestand.'}`;
       actions = '<button type="button" class="primary small" data-file-action="retry">Opnieuw</button><button type="button" class="ghost small" data-file-action="pick">Ander bestand</button>';
     } else if (!fsa && isIOS && !state.iosNoticeSeen) {
       title = 'Zo bewaart Uren je uren op een iPhone';
@@ -977,7 +998,7 @@ h2,h3{line-height:1.25}
       if (d.fileAction === 'create') return createLinkedFile();
       if (d.fileAction === 'pick') return pickLinkedFile();
       if (d.fileAction === 'unlink') return unlinkFile();
-      if (d.fileAction === 'retry') { fileError = null; writeLinkedFile(); return renderBanner(); }
+      if (d.fileAction === 'retry') { fileError = null; writeLinkedFile(true); return renderBanner(); }
     }
     if ('bannerDismiss' in d) { ui.bannerDismissed = true; return renderBanner(); }
     if ('bannerSeen' in d) { state.iosNoticeSeen = true; persist(); return renderBanner(); }
@@ -1033,6 +1054,7 @@ h2,h3{line-height:1.25}
   $('#dayNoticeBtn').addEventListener('click', ev => {
     const a = ev.currentTarget.dataset.action;
     if (a === 'file') saveToFile();
+    else if (a === 'filenow') writeLinkedFile(true);
     else { setView('settings'); const b = $('#installBox'); if (b && !b.hidden) b.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); }
   });
 

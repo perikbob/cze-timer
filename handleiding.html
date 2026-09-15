@@ -8,8 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F4F7F6; --surface:#fff; --tint:#EAF0EE; --ink:#17262A; --ink2:#5F6F72; --line:#DCE4E2; --line-strong:#C4D0CC;
-  --accent:#0F6E5C; --accent-soft:#E2F0EB; --android:#3E8B45; --iphone:#2F6BB0; --warn-bg:#FBF1E6; --warn:#8A4B12;
+  --bg:#F6F5FA; --surface:#fff; --tint:#EFEDF6; --ink:#1F1B2E; --ink2:#645E76; --line:#E3E0EB; --line-strong:#CCC7D9;
+  --accent:#9B51E0; --accent-dark:#8341C9; --accent-soft:#F0E7FB; --android:#3E8B45; --iphone:#0693E3; --warn-bg:#FFF4D6; --warn:#7A4E00;
   --font:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -17,15 +17,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);-w
 .wrap{max-width:680px;margin:0 auto;padding:0 20px 64px}
 header{padding:40px 0 8px}
 .eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--ink2);font-size:14px;font-weight:500}
-.mark{width:28px;height:28px;border-radius:8px;background:var(--accent);position:relative;flex:none}
-.mark::before,.mark::after,.mark span{content:'';position:absolute;left:7px;height:3px;border-radius:2px;background:#fff}
-.mark::before{top:8px;width:14px}.mark::after{top:13px;width:10px;opacity:.75}.mark span{top:18px;width:6px;opacity:.5}
+.mark{width:28px;height:28px;flex:none;background:url('icons/logo.png') center/contain no-repeat}
 h1{margin:10px 0 6px;font-size:32px;line-height:1.15;letter-spacing:-.02em;font-weight:700}
 .lede{margin:0;color:var(--ink2);font-size:17px}
 h2{font-size:22px;letter-spacing:-.01em;margin:40px 0 12px;line-height:1.2}
 h3{font-size:16px;margin:0 0 4px}
 p{margin:0 0 12px}
-a{color:var(--accent)}
+a{color:#7A38C2}
 b{font-weight:600}
 kbd{font:inherit;font-weight:600;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:1px 7px;white-space:nowrap}
 
@@ -36,7 +34,7 @@ kbd{font:inherit;font-weight:600;background:var(--surface);border:1px solid var(
 .seg button{font:inherit;font-size:17px;font-weight:600;padding:16px 12px;border-radius:12px;border:2px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
 .seg button svg{width:22px;height:22px}
 .seg button[data-p="android"].is-on{border-color:var(--android);background:#EAF3EA;color:#2B6A31}
-.seg button[data-p="iphone"].is-on{border-color:var(--iphone);background:#E8EFF8;color:#25548C}
+.seg button[data-p="iphone"].is-on{border-color:var(--iphone);background:#E6F4FE;color:#085E93}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* steps */
@@ -47,7 +45,7 @@ kbd{font:inherit;font-weight:600;background:var(--surface);border:1px solid var(
 .android .num{background:var(--android)}.iphone .num{background:var(--iphone)}
 .step-body{flex:1;min-width:0}
 .step-body p:last-child{margin:0}
-.check{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:#0B5A4B;font-size:14px}
+.check{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:#5E2E9A;font-size:14px}
 .check b{color:inherit}
 .warn{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--warn-bg);color:var(--warn);font-size:14px}
 .pill{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--tint);color:var(--ink2);font-size:13px;font-weight:600;margin-left:6px;vertical-align:middle}
@@ -55,7 +53,7 @@ kbd{font:inherit;font-weight:600;background:var(--surface);border:1px solid var(
 /* app link */
 .applink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:10px 0 4px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
-.btn:hover{background:#0B5A4B}
+.btn:hover{background:var(--accent-dark)}
 code.url{font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;word-break:break-all}
 
 /* generic sections */
@@ -118,7 +116,7 @@ footer{margin-top:48px;color:var(--ink2);font-size:14px;border-top:1px solid var
         <h3>Maak het urenbestand aan <span class="pill">eenmalig</span></h3>
         <p>De app bewaart al je uren in één bestand op je telefoon. Bovenaan staat <i>Maak het urenbestand aan</i>: tik op <kbd>Bestand aanmaken</kbd>, kies de map <b>Downloads</b>, laat de naam <b>uren.json</b> staan en tik op <kbd>Opslaan</kbd>.</p>
         <p>Bij je eerste boeking kan Chrome één keer vragen of Uren het bestand mag bewerken. Kies <kbd>Toestaan</kbd>. Daarna hoor je er nooit meer iets van: het bestand wordt bij elke boeking vanzelf bijgewerkt.</p>
-        <div class="check"><b>Controle:</b> tik op <kbd>Types</kbd> en kijk onder <i>Gegevens en opslag</i>. Er staat <i>Als app geïnstalleerd: Ja</i> en <i>Urenbestand: uren.json, bijgewerkt bij elke boeking</i>.</div>
+        <div class="check"><b>Controle:</b> tik op het <kbd>tandwiel</kbd> rechtsboven en kijk onder <i>Gegevens en opslag</i>. Er staat <i>Als app geïnstalleerd: Ja</i> en <i>Urenbestand: uren.json, bijgewerkt bij elke boeking</i>.</div>
       </div>
     </li>
     <li>
@@ -150,7 +148,7 @@ footer{margin-top:48px;color:var(--ink2);font-size:14px;border-top:1px solid var
         <h3>Zet Uren op je beginscherm <span class="pill">vóór je gaat boeken</span></h3>
         <p>Tik onderaan op <kbd>Delen</kbd> (het vierkantje met de pijl omhoog), scrol omlaag en kies <kbd>Zet op beginscherm</kbd>, dan <kbd>Voeg toe</kbd>.</p>
         <p>Sluit Safari en open <b>Uren vanaf je beginscherm</b>. Vanaf nu gebruik je altijd dat icoon. Wat je in Safari boekt, komt niet in de app terecht.</p>
-        <div class="check"><b>Controle:</b> tik op <kbd>Types</kbd> en kijk onder <i>Gegevens en opslag</i>. Er staat <i>Als app geïnstalleerd: Ja</i>.</div>
+        <div class="check"><b>Controle:</b> tik op het <kbd>tandwiel</kbd> rechtsboven en kijk onder <i>Gegevens en opslag</i>. Er staat <i>Als app geïnstalleerd: Ja</i>.</div>
       </div>
     </li>
     <li>
@@ -164,8 +162,8 @@ footer{margin-top:48px;color:var(--ink2);font-size:14px;border-top:1px solid var
       <span class="num">4</span>
       <div class="step-body">
         <h3>Elke werkdag één tik: Bewaar naar bestand <span class="pill">belangrijk</span></h3>
-        <p>Onder het boekpaneel staat <i>3 boekingen nog niet in een bestand</i> met de knop <kbd>Bewaar naar bestand</kbd>. Tik daarop, kies <kbd>Bewaar in Bestanden</kbd>, kies een map (bijvoorbeeld <b>iCloud Drive</b> of <b>Op mijn iPhone</b>) en tik op <kbd>Bewaar</kbd>. Klaar tot morgen.</p>
-        <p>Vergeet je het een dag, dan wordt die regel rood. Het bestand heet <b>uren-datum.json</b>; elke keer komt er een nieuwe bij en de nieuwste is altijd compleet, dus oudere mag je weggooien.</p>
+        <p>Onder het boekpaneel staat <i>3 boekingen nog niet in een bestand</i> met de knop <kbd>Bewaar naar bestand</kbd>. Tik daarop, kies <kbd>Bewaar in Bestanden</kbd>, kies een map (bijvoorbeeld <b>OneDrive</b> of <b>iCloud Drive</b>) en tik op <kbd>Bewaar</kbd>. Klaar tot morgen.</p>
+        <p>Vergeet je het een dag, dan wordt die regel rood. Het bestand heet altijd <b>uren.json</b>. Kies steeds dezelfde map; iOS vraagt dan of het bestand vervangen mag worden, tik op <kbd>Vervangen</kbd>. Zo is er één bestand dat altijd de laatste stand bevat.</p>
         <div class="warn">Verwijder je de app zonder dat je ooit hebt bewaard, dan zijn de uren weg. Die ene tik per dag is je verzekering.</div>
       </div>
     </li>
@@ -173,7 +171,7 @@ footer{margin-top:48px;color:var(--ink2);font-size:14px;border-top:1px solid var
       <span class="num">5</span>
       <div class="step-body">
         <h3>Nieuwe telefoon of app verwijderd?</h3>
-        <p>Installeer Uren opnieuw (stap 1 en 2), tik op <kbd>Types</kbd> → <kbd>Bestand terugzetten</kbd> en kies je <b>nieuwste</b> uren-bestand. Alles staat er weer.</p>
+        <p>Installeer Uren opnieuw (stap 1 en 2), tik op het <kbd>tandwiel</kbd> rechtsboven → <kbd>Bestand terugzetten</kbd> en kies je <b>uren.json</b>. Alles staat er weer.</p>
       </div>
     </li>
   </ol>
@@ -218,7 +216,7 @@ footer{margin-top:48px;color:var(--ink2);font-size:14px;border-top:1px solid var
     <dt>Ik zie “Nieuwe versie klaar”.</dt>
     <dd>Sluit de app helemaal en open hem opnieuw. Je uren blijven staan.</dd>
     <dt>Kan ik types toevoegen of hernoemen?</dt>
-    <dd>Ja, onder <kbd>Types</kbd>. Archiveren verbergt een type bij het boeken; bestaande uren blijven staan.</dd>
+    <dd>Nee. De lijst met types is voor iedereen gelijk en wordt centraal beheerd. Mis je een type, meld het dan bij de beheerder van de pilot; bij een nieuwe versie van de app verschijnt het vanzelf.</dd>
     <dt>Hoe zet ik minuten om naar uren?</dt>
     <dd>De app toont uren:minuten (1:30). De CSV-export bevat ook een kolom met decimale uren (1,50).</dd>
   </dl>

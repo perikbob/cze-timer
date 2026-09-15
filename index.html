@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#F4F7F6">
+<meta name="theme-color" content="#F6F5FA">
 <title>Uren</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
@@ -18,13 +18,19 @@
 </style>
 <style>
 :root{
-  --bg:#F4F7F6; --surface:#FFFFFF; --tint:#EAF0EE; --track:#E1E9E6;
-  --ink:#17262A; --ink2:#5F6F72; --line:#DCE4E2; --line-strong:#C4D0CC;
-  --accent:#0F6E5C; --accent-dark:#0B5A4B; --accent-soft:#E2F0EB;
-  --danger:#B0463E; --focus:#2F6BB0;
+  /* Huisstijl: primair #9B51E0 (paars), secundair #0693E3 (blauw). Tinten afgeleid van #8ED1FC, #FCB900, #FF6900.
+     Categoriekleuren staan los hiervan in PALETTE. */
+  --bg:#F6F5FA; --surface:#FFFFFF; --tint:#EFEDF6; --track:#E5E2EE; --hover:#F1EEF7; --pill:#E8E5F0;
+  --ink:#1F1B2E; --ink2:#645E76; --line:#E3E0EB; --line-strong:#CCC7D9;
+  --accent:#9B51E0; --accent-dark:#8341C9; --accent-text:#7A38C2; --accent-soft:#F0E7FB;
+  --info:#0693E3; --info-soft:#E6F4FE; --info-text:#085E93;
+  --warn-soft:#FFF4D6; --warn-line:#F3DFA6; --warn-text:#7A4E00;
+  --err-soft:#FFE9DC; --err-text:#8A3412;
+  --danger:#B0463E; --focus:#0693E3;
   --font:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 button,input{font:inherit;color:inherit}
@@ -36,12 +42,14 @@ h2,h3{line-height:1.25}
 @media (min-width:720px){.wrap{padding:0 24px}}
 
 /* header */
-.top{position:sticky;top:0;z-index:5;background:rgba(244,247,246,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:0;z-index:5;background:rgba(246,245,250,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
-.brand{font-weight:600;font-size:20px;letter-spacing:-.01em}
-.tabs{display:flex;background:#E4EBE8;border-radius:999px;padding:3px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:20px;letter-spacing:-.01em}
+.brand img{width:28px;height:28px;flex:none}
+.tabs{display:flex;background:var(--pill);border-radius:999px;padding:3px}
 .tab{padding:7px 16px;border-radius:999px;font-weight:500;color:var(--ink2)}
 .tab.is-active{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(23,38,42,.14)}
+.tab-icon{padding:7px 13px;display:grid;place-items:center}
 
 /* day view */
 .daynav{display:flex;align-items:center;gap:8px;padding:20px 0 16px}
@@ -51,8 +59,8 @@ h2,h3{line-height:1.25}
 #dayPicker{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
 .daysub{display:flex;justify-content:center;align-items:center;gap:10px;min-height:24px;font-size:14px;color:var(--ink2)}
 .iconbtn{width:40px;height:40px;flex:none;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface);display:grid;place-items:center;color:var(--ink)}
-.iconbtn:hover{background:#EEF3F1}
-.linkbtn{color:var(--accent);font-weight:600;padding:2px 6px;border-radius:6px;font-size:14px}
+.iconbtn:hover{background:var(--hover)}
+.linkbtn{color:var(--accent-text);font-weight:600;padding:2px 6px;border-radius:6px;font-size:14px}
 .linkbtn:hover{text-decoration:underline}
 
 .bar{display:flex;gap:2px;height:14px;border-radius:7px;background:var(--track);overflow:hidden}
@@ -65,7 +73,7 @@ h2,h3{line-height:1.25}
 .entries>li{border-bottom:1px solid var(--line)}
 .entries>li:last-child{border-bottom:0}
 .entry{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 8px 13px 6px;border-radius:10px;margin:1px 0}
-.entry:hover{background:#EEF3F1}
+.entry:hover{background:var(--hover)}
 .entry.is-editing{background:var(--accent-soft)}
 .dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
 .entry-main{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -88,50 +96,50 @@ h2,h3{line-height:1.25}
 .timer-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
 .timer-time{font-size:22px;font-weight:600;letter-spacing:-.01em}
 .timer.is-running .timer-time{font-size:26px}
-.timer-sub{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer-sub{font-size:13px;color:var(--ink2)}
 .booking h2{margin-bottom:10px}
 .listhead{margin:22px 0 2px;font-size:14px;font-weight:600;color:var(--ink2)}
 .strip{position:relative;margin:0 -16px}
-.strip::after{content:'';position:absolute;top:0;right:0;bottom:6px;width:36px;background:linear-gradient(90deg,rgba(234,240,238,0),var(--tint));pointer-events:none;opacity:1;transition:opacity .2s}
+.strip::after{content:'';position:absolute;top:0;right:0;bottom:6px;width:36px;background:linear-gradient(90deg,transparent,var(--fade,var(--tint)));pointer-events:none;opacity:1;transition:opacity .2s}
+.strip-bg{--fade:var(--bg)}
 .strip.at-end::after{opacity:0}
-.chips{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);gap:8px;padding:2px 16px 6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);gap:8px;padding:2px 16px 6px;scroll-padding:0 16px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .chips::-webkit-scrollbar{display:none}
-.chips.wrap-chips{display:flex;flex-wrap:wrap;gap:10px;overflow:visible;padding:2px}
 .chip{scroll-snap-align:start}
-.chip{display:inline-flex;align-items:center;gap:9px;padding:10px 16px;min-height:44px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);white-space:nowrap;font-weight:500;--c:var(--ink2)}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:10px 16px;min-height:44px;max-width:min(78vw,320px);border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);white-space:nowrap;font-weight:500;--c:var(--ink2)}
 .chip:hover{border-color:var(--c)}
 .chip .dot{background:var(--c)}
+.chip-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip.is-selected{background:var(--c);border-color:var(--c);color:#fff}
 .chip.is-selected .dot{background:rgba(255,255,255,.75)}
 .chip-all{--c:var(--ink)}
 .presets{display:flex;gap:10px;margin-top:12px;padding:2px}
 .preset{flex:1;min-width:0;min-height:44px;padding:10px 6px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:600;white-space:nowrap}
-.preset:hover:not(.is-selected){background:#EEF3F1}
-.preset.is-selected{background:var(--ink);border-color:var(--ink);color:#fff}
+.preset:hover:not(.is-selected){background:var(--hover)}
+.preset.is-selected{background:var(--accent);border-color:var(--accent);color:#fff}
 .stepper{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 0 10px}
 .stepbtn{width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);font-size:26px;line-height:1;display:grid;place-items:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-.stepbtn:hover:not(:disabled){background:#EEF3F1}
+.stepbtn:hover:not(:disabled){background:var(--hover)}
 .stepbtn:disabled{opacity:.4}
 .duration{font-size:32px;font-weight:600;min-width:120px;text-align:center;letter-spacing:-.02em;line-height:1;user-select:none;-webkit-user-select:none}
 .text{width:100%;height:46px;padding:0 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface)}
-.text::placeholder{color:#8A9799}
+.text::placeholder{color:#948EA6}
 .actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
 .primary{background:var(--accent);color:#fff;font-weight:600;height:46px;padding:0 20px;border-radius:10px;flex:1}
 .primary:hover{background:var(--accent-dark)}
 .ghost{height:46px;padding:0 16px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:500}
-.ghost:hover:not(:disabled){background:#EEF3F1}
+.ghost:hover:not(:disabled){background:var(--hover)}
 .ghost:disabled{opacity:.5}
 .small{height:38px;padding:0 14px;font-size:14px}
 .danger-text{color:var(--danger)}
-#deleteBtn.is-armed{background:var(--danger);color:#fff;border-color:var(--danger)}
+.ghost.is-armed{background:var(--danger);color:#fff;border-color:var(--danger)}
 .hint{color:var(--ink2);font-size:14px;margin:0}
 .hint .linkbtn{padding:0}
 
 /* list view */
 .filters{padding:18px 0 6px;display:flex;flex-direction:column;gap:12px}
-.seg{display:inline-flex;align-self:flex-start;max-width:100%;overflow-x:auto;background:#E4EBE8;border-radius:10px;padding:3px;scrollbar-width:none}
-.seg::-webkit-scrollbar{display:none}
-.seg button{padding:7px 12px;border-radius:8px;font-weight:500;color:var(--ink2);white-space:nowrap}
+.seg{display:flex;background:var(--pill);border-radius:10px;padding:3px}
+.seg button{flex:1;padding:7px 4px;border-radius:8px;font-weight:500;font-size:14px;color:var(--ink2);white-space:nowrap}
 .seg button.is-active{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(23,38,42,.14)}
 .range{display:flex;gap:12px;flex-wrap:wrap}
 .range label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)}
@@ -146,7 +154,7 @@ h2,h3{line-height:1.25}
 .group{padding-top:16px}
 .group-head{display:flex;justify-content:space-between;align-items:center;padding:0 0 2px}
 .group-head .open{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;color:var(--ink);padding:4px 6px;margin-left:-6px;border-radius:8px}
-.group-head .open:hover{background:#EEF3F1}
+.group-head .open:hover{background:var(--hover)}
 .group-head .open svg{color:var(--ink2)}
 .group-total{font-weight:600;color:var(--ink2);font-size:14px}
 .list-foot{padding:20px 0 40px;display:flex;gap:10px}
@@ -156,37 +164,34 @@ h2,h3{line-height:1.25}
 .type-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
 .type-name{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .type-total{color:var(--ink2);font-size:14px}
-.type-edit{flex-direction:column;align-items:stretch;gap:12px;background:var(--tint);border-radius:14px;padding:14px;border-bottom:0;margin:6px 0}
-.type-edit .hint{margin-top:-2px}
-.swatches{display:flex;gap:10px;flex-wrap:wrap;padding:2px}
-.swatch{width:30px;height:30px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px rgba(23,38,42,.1)}
-.swatch.is-selected{border-color:#fff;box-shadow:0 0 0 2px var(--ink)}
-.row-actions{display:flex;gap:8px;flex-wrap:wrap}
-.archived-head{margin:28px 0 0;font-size:14px;color:var(--ink2);font-weight:500}
-.notice{background:#FBEFEA;color:#7A2F28;border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.notice{background:var(--err-soft);color:var(--err-text);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
 .status{margin:0 0 14px;padding:0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
 .status dt{color:var(--ink2)}
 .status dd{margin:0;font-weight:500}
-.status .warn{color:#8A4B12}
+.status .warn{color:var(--warn-text)}
 .install{margin:0 0 14px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .install p{margin:0 0 10px}
 .install p:last-child{margin:0}
 .quiet{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:16px 0 32px;padding:10px 12px 10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink2);font-size:14px}
 .quiet .linkbtn{flex:none}
-.banner{margin:18px 0 -4px;padding:14px 16px;border-radius:14px;background:var(--accent-soft);color:var(--ink)}
-.banner.is-error{background:#FBEFEA}
+.banner{margin:18px 0 -4px;padding:14px 16px;border-radius:14px;background:var(--info-soft);color:var(--ink)}
+.banner.is-error{background:var(--err-soft)}
 .banner-text{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2)}
-.banner-text b{font-size:15px;color:var(--ink);font-weight:600}
-.banner.is-error .banner-text b{color:#7A2F28}
+.banner-text b{font-size:15px;color:var(--info-text);font-weight:600}
+.banner.is-error .banner-text b{color:var(--err-text)}
 .banner-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
-.quiet.is-warn{background:#FBEFEA;border-color:#EFD3CA;color:#7A2F28}
-.quiet.is-warn .linkbtn{color:#7A2F28}
+.quiet.is-warn{background:var(--warn-soft);border-color:var(--warn-line);color:var(--warn-text)}
+.quiet.is-warn .linkbtn{color:var(--warn-text)}
 .panel code{font:inherit;font-weight:500;color:var(--ink)}
 .panel b{font-weight:600;color:var(--ink)}
 .filebtn{display:inline-flex;align-items:center;cursor:pointer}
 .data-actions{display:flex;gap:10px;flex-wrap:wrap}
 .space{height:40px}
 
+/* splash: shown from the first paint, fades out once the app has rendered */
+#splash{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg);transition:opacity .3s}
+#splash img{width:min(32vw,120px);height:auto;transform:translateY(-6vh)}
+#splash.is-done{opacity:0;pointer-events:none}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,12px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:10;max-width:calc(100% - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .toast.is-visible{opacity:1;transform:translate(-50%,0)}
 
@@ -194,13 +199,14 @@ h2,h3{line-height:1.25}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><img src="./icons/logo.png" alt="" width="120" height="120"></div>
 <header class="top">
   <div class="wrap top-inner">
-    <div class="brand">Uren</div>
+    <div class="brand"><img src="./icons/logo.png" alt="" width="28" height="28">Uren</div>
     <nav class="tabs" role="tablist" aria-label="Weergave">
       <button type="button" class="tab" role="tab" data-view="day">Dag</button>
       <button type="button" class="tab" role="tab" data-view="list">Lijst</button>
-      <button type="button" class="tab" role="tab" data-view="types">Types</button>
+      <button type="button" class="tab tab-icon" role="tab" data-view="settings" aria-label="Instellingen" title="Instellingen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </nav>
   </div>
 </header>
@@ -264,13 +270,13 @@ h2,h3{line-height:1.25}
         <button type="button" data-period="7">7 dagen</button>
         <button type="button" data-period="30">30 dagen</button>
         <button type="button" data-period="90">90 dagen</button>
-        <button type="button" data-period="custom">Eigen periode</button>
+        <button type="button" data-period="custom">Eigen</button>
       </div>
       <div class="range" id="customRange" hidden>
         <label>Van <input type="date" id="fromDate"></label>
         <label>Tot <input type="date" id="toDate"></label>
       </div>
-      <div class="chips wrap-chips" id="filterChips" role="group" aria-label="Types"></div>
+      <div class="strip strip-bg" id="filterStrip"><div class="chips" id="filterChips" role="group" aria-label="Types"></div></div>
     </div>
 
     <div class="summary">
@@ -285,21 +291,8 @@ h2,h3{line-height:1.25}
     </div>
   </section>
 
-  <!-- Types -->
-  <section id="view-types" class="view" hidden>
-    <ul class="typelist" id="typeList"></ul>
-    <div id="archivedWrap" hidden>
-      <h2 class="archived-head">Gearchiveerd</h2>
-      <ul class="typelist" id="archivedList"></ul>
-    </div>
-
-    <section class="panel" aria-labelledby="newTypeTitle">
-      <h2 id="newTypeTitle">Nieuw type</h2>
-      <input class="text" id="newTypeName" placeholder="Bijvoorbeeld: Cliëntcontact" maxlength="40" autocomplete="off">
-      <div class="swatches" id="newTypeSwatches" role="group" aria-label="Kleur" style="margin:12px 0"></div>
-      <button type="button" class="primary" id="addTypeBtn" style="flex:none">Type toevoegen</button>
-    </section>
-
+  <!-- Instellingen -->
+  <section id="view-settings" class="view" hidden>
     <section class="panel" aria-labelledby="dataTitle">
       <h2 id="dataTitle">Gegevens en opslag</h2>
       <div class="notice" id="persistNotice" hidden>Deze browser bewaart niets: je gegevens verdwijnen als je de pagina sluit. Bewaar naar een bestand voordat je stopt.</div>
@@ -310,6 +303,11 @@ h2,h3{line-height:1.25}
       <div class="data-actions">
         <button type="button" class="ghost small" id="fileBtn">Bewaar naar bestand</button>
         <label class="ghost small filebtn">Bestand terugzetten<input type="file" id="importJson" accept="application/json,.json" hidden></label>
+      </div>
+      <div id="snapWrap" hidden>
+        <h3 class="listhead">Kopieën op dit toestel</h3>
+        <p class="hint">Elke dag bij de eerste start, en vóór elk terugzetten, bewaart Uren een kopie van de boekingen op dit toestel, twee weken lang. Dat beschermt tegen vergissingen, niet tegen verlies van het toestel.</p>
+        <ul class="typelist" id="snapList"></ul>
       </div>
     </section>
     <div class="space"></div>
@@ -323,6 +321,8 @@ h2,h3{line-height:1.25}
   const KEY = 'uren-poc-v1';
   const STEP = 15;
   const MAX_MIN = 24 * 60;
+  const APP_VERSION = '1.3';
+  const SNAP_DAYS = 14;
   const PALETTE = ['#0F6E5C','#2A8FA3','#2F6BB0','#6A5BC2','#9C4F9E','#B04B7E','#B0463E','#C8742A','#9C8420','#5E8B2F','#6E7F82','#8C5A2B','#5C6BC0','#00838F','#AD1457','#B58900'];
   const UNKNOWN = { name: 'Onbekend type', color: '#9AA7A9' };
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -338,6 +338,7 @@ h2,h3{line-height:1.25}
   const addDays = (s, n) => { const d = fromStr(s); d.setDate(d.getDate() + n); return toStr(d); };
   const fmtMin = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
   const fmtDec = m => (m / 60).toFixed(2).replace('.', ',');
+  const fmtStamp = ts => { if (!ts) return ''; const d = new Date(ts); return `${toStr(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
   const longDate = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
   const longDateYear = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const fullDate = s => (fromStr(s).getFullYear() === new Date().getFullYear() ? longDate : longDateYear).format(fromStr(s));
@@ -373,7 +374,7 @@ h2,h3{line-height:1.25}
     'Thuiswerk opleiding (buiten contract)',
     'Overig',
   ];
-  const defaultTypes = () => DEFAULT_TYPES.map((name, i) => ({ id: uid(), name, color: PALETTE[i % PALETTE.length], archived: false }));
+  const defaultTypes = () => DEFAULT_TYPES.map((name, i) => ({ id: uid(), name, color: PALETTE[i % PALETTE.length], archived: false, created: Date.now() }));
   function seed() { return { version: 1, seedVersion: SEED_VERSION, entries: [], types: defaultTypes() }; }
   // Seed migrations, run on every load of stored data (local, mirror, linked file, backup).
   // v2: an earlier build shipped four placeholder types; if those are still the only types and
@@ -388,7 +389,7 @@ h2,h3{line-height:1.25}
     if (from < 3) {
       const have = new Set(s.types.map(t => t.name.trim().toLowerCase()));
       const missing = DEFAULT_TYPES.filter(n => !have.has(n.toLowerCase()));
-      const added = missing.map((name, i) => ({ id: uid(), name, color: PALETTE[(s.types.length + i) % PALETTE.length], archived: false }));
+      const added = missing.map((name, i) => ({ id: uid(), name, color: PALETTE[(s.types.length + i) % PALETTE.length], archived: false, created: Date.now() }));
       const at = s.types.findIndex(t => t.name === 'Overig' && !t.archived);
       s.types.splice(at < 0 ? s.types.length : at, 0, ...added);
     }
@@ -422,6 +423,14 @@ h2,h3{line-height:1.25}
     const db = await idbOpen();
     return new Promise((res, rej) => { const tx = db.transaction(STORE, 'readwrite'); tx.objectStore(STORE).put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); });
   }
+  async function idbDel(key) {
+    const db = await idbOpen();
+    return new Promise((res, rej) => { const tx = db.transaction(STORE, 'readwrite'); tx.objectStore(STORE).delete(key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); });
+  }
+  async function idbKeys() {
+    const db = await idbOpen();
+    return new Promise((res, rej) => { const rq = db.transaction(STORE).objectStore(STORE).getAllKeys(); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
+  }
   let persistRequested = false;
   async function ensurePersistent(request) {
     try {
@@ -429,15 +438,15 @@ h2,h3{line-height:1.25}
       storageInfo.persisted = await navigator.storage.persisted();
       if (!storageInfo.persisted && request && !persistRequested) { persistRequested = true; storageInfo.persisted = await navigator.storage.persist(); }
     } catch (e) { storageInfo.persisted = null; }
-    if (ui.view === 'types') renderTypes();
+    if (ui.view === 'settings') renderSettings();
   }
   function persist() {
     state.savedAt = Date.now();
     try { localStorage.setItem(KEY, JSON.stringify(state)); }
-    catch (e) { if (storageInfo.local) { storageInfo.local = false; if (ui.view === 'types') renderTypes(); } }
+    catch (e) { if (storageInfo.local) { storageInfo.local = false; if (ui.view === 'settings') renderSettings(); } }
     idbSet(KEY, JSON.parse(JSON.stringify(state))).then(() => { storageInfo.idb = true; }).catch(() => {
       storageInfo.idb = false;
-      if (!storageInfo.local) toast('Bewaren lukt niet in deze browser. Bewaar naar een bestand via Types.', 4000);
+      if (!storageInfo.local) toast('Bewaren lukt niet in deze browser. Bewaar naar een bestand via Instellingen.', 4000);
     });
     if (!storageInfo.persisted) ensurePersistent(true);
   }
@@ -473,7 +482,7 @@ h2,h3{line-height:1.25}
       fileError = null; markFileSaved(); persist();
     }).catch(e => {
       fileError = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'permission' : 'write';
-    }).then(() => { fileBusy = false; renderBanner(); renderDayNotice(); if (ui.view === 'types') renderTypes(); });
+    }).then(() => { fileBusy = false; renderBanner(); renderDayNotice(); if (ui.view === 'settings') renderSettings(); });
   }
   async function setHandle(h) {
     fileHandle = h; fileError = null; state.linkedFileName = h.name;
@@ -485,12 +494,14 @@ h2,h3{line-height:1.25}
     try { await idbSet('fileHandle', null); } catch (e) {}
     persist(); renderAll();
   }
-  // Adopt data from the file when it is newer than what this device has.
+  // Adopt data from the file when it is newer than what this device has. Only bookings and types
+  // come from the file; device-bound fields (timer, iOS notice, linked file name) stay.
   function adoptFileData(data, msg) {
     if (!valid(data)) return false;
     if ((data.savedAt || 0) <= (state.savedAt || 0)) return false;
-    const name = state.linkedFileName;
-    state = upgradeSeed(data); state.linkedFileName = name; state.changesSinceFile = 0;
+    const { linkedFileName, timer, iosNoticeSeen } = state;
+    state = upgradeSeed({ version: 1, seedVersion: data.seedVersion, savedAt: data.savedAt, fileSavedAt: data.fileSavedAt, entries: data.entries, types: data.types, linkedFileName, timer, iosNoticeSeen });
+    state.changesSinceFile = 0;
     resetDraft(); persist(); renderAll();
     if (msg && state.entries.length) toast(msg, 3000);
     return true;
@@ -518,7 +529,7 @@ h2,h3{line-height:1.25}
   async function loadLinkedFile() {
     if (!fsaAvailable()) return;
     try { const h = await idbGet('fileHandle'); if (h) { fileHandle = h; state.linkedFileName = h.name; } } catch (e) {}
-    renderBanner(); renderDayNotice(); if (ui.view === 'types') renderTypes();
+    renderBanner(); renderDayNotice(); if (ui.view === 'settings') renderSettings();
     if (!fileHandle) return;
     try {
       if (!(await filePermission(false))) return;
@@ -526,8 +537,10 @@ h2,h3{line-height:1.25}
       if (text.trim()) adoptFileData(JSON.parse(text), `Uren hersteld uit ${fileHandle.name}`);
     } catch (e) {}
   }
-  const fileName = () => `uren-${today()}.json`;
-  const fileJson = () => JSON.stringify(state, null, 2);
+  // One fixed name on every platform: Android rewrites the linked file in place, and on iPhone the
+  // Files app asks to replace the previous copy, so there is always exactly one uren.json.
+  const fileName = () => 'uren.json';
+  const fileJson = () => JSON.stringify({ ...state, exportedAt: new Date().toISOString(), app: 'Uren ' + APP_VERSION }, null, 2);
   const unsavedCount = () => state.changesSinceFile || 0;
   function markChanged() { state.changesSinceFile = unsavedCount() + 1; }
   function markFileSaved() { state.fileSavedAt = Date.now(); state.changesSinceFile = 0; }
@@ -538,7 +551,51 @@ h2,h3{line-height:1.25}
       if ((state.savedAt || 0) >= (m.savedAt || 0)) return;
       state = upgradeSeed(m); resetDraft(); persist(); renderAll();
       if (state.entries.length) toast('Uren hersteld uit de reservekopie op dit apparaat', 3500);
-    } catch (e) { storageInfo.idb = false; if (ui.view === 'types') renderTypes(); }
+    } catch (e) { storageInfo.idb = false; if (ui.view === 'settings') renderSettings(); }
+  }
+  // ---------- snapshots ----------
+  // A copy of bookings and types in IndexedDB: one per day at the first start, plus one right before
+  // every restore. Kept SNAP_DAYS days. An undo for mistakes, not a backup against losing the device.
+  const SNAP = 'snap:';
+  let snapshots = []; // newest first: { key, at, count, data }
+  const snapKey = reason => SNAP + today() + (reason ? 'T' + new Date().toTimeString().slice(0, 8).replace(/:/g, '-') + '-' + reason : '');
+  const snapDate = key => key.slice(SNAP.length, SNAP.length + 10);
+  const snapLabel = s => { const d = new Date(s.at); return `${dayTitle(toStr(d))}, ${pad(d.getHours())}:${pad(d.getMinutes())}${s.key.endsWith('-terugzetten') ? ' · vóór terugzetten' : ''}`; };
+  async function loadSnapshots() {
+    try {
+      const keys = (await idbKeys()).filter(k => typeof k === 'string' && k.startsWith(SNAP)).sort().reverse();
+      const cutoff = addDays(today(), -SNAP_DAYS);
+      const list = [];
+      for (const k of keys) {
+        if (snapDate(k) < cutoff) { await idbDel(k); continue; }
+        const v = await idbGet(k);
+        if (valid(v)) list.push({ key: k, at: v.at, count: v.entries.length, data: v });
+      }
+      snapshots = list;
+    } catch (e) { snapshots = []; }
+    if (ui.view === 'settings') renderSettings();
+  }
+  async function saveSnapshot(reason) {
+    const body = { at: Date.now(), savedAt: state.savedAt, seedVersion: state.seedVersion, entries: state.entries, types: state.types };
+    try { await idbSet(snapKey(reason), JSON.parse(JSON.stringify(body))); } catch (e) { return; }
+    await loadSnapshots();
+  }
+  async function dailySnapshot() {
+    await loadSnapshots();
+    if (!snapshots.some(s => s.key === snapKey(''))) await saveSnapshot('');
+  }
+  // Replace bookings and types with data from a backup file or a snapshot. An explicit choice by the
+  // user, so it wins regardless of age. Device-bound fields (running timer, linked file, iOS notice)
+  // stay, seed migrations run, a snapshot is taken first, and a linked file is rewritten to match.
+  async function replaceState(data, source) {
+    await saveSnapshot('terugzetten');
+    const { timer, linkedFileName, iosNoticeSeen } = state;
+    state = upgradeSeed({ version: 1, seedVersion: data.seedVersion, types: data.types, entries: data.entries, timer, linkedFileName, iosNoticeSeen });
+    ui.editingId = null; ui.typeFilter.clear(); ui.draft.typeId = null; ui.confirmSnap = null; resetDraft();
+    if (fileHandle) { markChanged(); save(); }
+    else if (source === 'file') { markFileSaved(); persist(); }
+    else { markChanged(); persist(); }
+    renderAll();
   }
   let state = loadLocal() || seed();
 
@@ -546,7 +603,7 @@ h2,h3{line-height:1.25}
     view: 'day', date: today(),
     editingId: null, draft: { typeId: null, minutes: 60, note: '' }, confirmDelete: false,
     period: '7', from: addDays(today(), -29), to: today(), typeFilter: new Set(),
-    editType: null, editName: '', editColor: PALETTE[0], newColor: PALETTE[0],
+    confirmSnap: null,
   };
 
   const typeById = id => state.types.find(t => t.id === id);
@@ -606,8 +663,8 @@ h2,h3{line-height:1.25}
     const cur = typeById(ui.draft.typeId);
     if (cur && cur.archived) list = [...list, cur];
     $('#typeChips').innerHTML = list.length
-      ? list.map(t => `<button type="button" class="chip${t.id === ui.draft.typeId ? ' is-selected' : ''}" data-type="${t.id}" style="--c:${t.color}" role="radio" aria-checked="${t.id === ui.draft.typeId}"><span class="dot"></span>${esc(t.name)}</button>`).join('')
-      : `<p class="hint">Nog geen types. Maak er eerst een aan onder <button type="button" class="linkbtn" data-goto="types">Types</button>.</p>`;
+      ? list.map(t => `<button type="button" class="chip${t.id === ui.draft.typeId ? ' is-selected' : ''}" data-type="${t.id}" style="--c:${t.color}" role="radio" aria-checked="${t.id === ui.draft.typeId}"><span class="dot"></span><span class="chip-label">${esc(t.name)}</span></button>`).join('')
+      : `<p class="hint">Er zijn geen types beschikbaar.</p>`;
     syncDuration();
     revealSelectedChip();
     renderTimer();
@@ -636,7 +693,7 @@ h2,h3{line-height:1.25}
     const all = ui.typeFilter.size === 0;
     $('#filterChips').innerHTML =
       `<button type="button" class="chip chip-all${all ? ' is-selected' : ''}" data-filter="all" aria-pressed="${all}">Alle types</button>` +
-      relevant.map(t => `<button type="button" class="chip${ui.typeFilter.has(t.id) ? ' is-selected' : ''}" data-filter="${t.id}" style="--c:${t.color}" aria-pressed="${ui.typeFilter.has(t.id)}"><span class="dot"></span>${esc(t.name)}</button>`).join('');
+      relevant.map(t => `<button type="button" class="chip${ui.typeFilter.has(t.id) ? ' is-selected' : ''}" data-filter="${t.id}" style="--c:${t.color}" aria-pressed="${ui.typeFilter.has(t.id)}"><span class="dot"></span><span class="chip-label">${esc(t.name)}</span></button>`).join('');
 
     const shown = all ? inRange : inRange.filter(e => ui.typeFilter.has(e.typeId));
     renderBar($('#listBar'), shown, 0);
@@ -657,39 +714,10 @@ h2,h3{line-height:1.25}
         <ul class="entries">${es.map(entryHTML).join('')}</ul></section>`;
     }).join('');
     $('#exportCsv').disabled = shown.length === 0;
+    updateStripFade();
   }
 
-  function swatchesHTML(sel, ctx) {
-    return PALETTE.map(c => `<button type="button" class="swatch${c === sel ? ' is-selected' : ''}" data-swatch="${c}" data-ctx="${ctx}" style="background:${c}" aria-label="Kleur" aria-pressed="${c === sel}"></button>`).join('');
-  }
-
-  function renderTypes() {
-    const mins = new Map(), nums = new Map();
-    for (const e of state.entries) { mins.set(e.typeId, (mins.get(e.typeId) || 0) + e.minutes); nums.set(e.typeId, (nums.get(e.typeId) || 0) + 1); }
-    const row = t => {
-      const n = nums.get(t.id) || 0;
-      if (ui.editType === t.id) {
-        return `<li class="type-row type-edit">
-          <input class="text" id="editTypeName" value="${esc(ui.editName)}" aria-label="Naam van het type" maxlength="40" autocomplete="off">
-          <div class="swatches" role="group" aria-label="Kleur">${swatchesHTML(ui.editColor, 'edit')}</div>
-          <div class="row-actions">
-            <button type="button" class="primary small" style="flex:none" data-save-type="${t.id}">Opslaan</button>
-            <button type="button" class="ghost small" data-cancel-type>Annuleren</button>
-            ${t.archived ? `<button type="button" class="ghost small" data-unarchive="${t.id}">Herstellen</button>` : `<button type="button" class="ghost small" data-archive="${t.id}">Archiveren</button>`}
-            ${n === 0 ? `<button type="button" class="ghost small danger-text" data-delete-type="${t.id}">Verwijderen</button>` : ''}
-          </div>
-          ${n > 0 ? `<p class="hint">${plural(n, 'boeking gebruikt', 'boekingen gebruiken')} dit type. Archiveren verbergt het bij het boeken; bestaande uren blijven staan.</p>` : ''}
-        </li>`;
-      }
-      return `<li class="type-row"><span class="dot" style="background:${t.color}"></span><span class="type-name">${esc(t.name)}</span><span class="type-total">${fmtMin(mins.get(t.id) || 0)}</span><button type="button" class="ghost small" data-edit-type="${t.id}">Bewerken</button></li>`;
-    };
-    const act = activeTypes(), arch = state.types.filter(t => t.archived);
-    $('#typeList').innerHTML = act.map(row).join('') || `<li class="hint" style="padding:12px 4px">Nog geen types. Voeg er hieronder een toe.</li>`;
-    $('#archivedWrap').hidden = arch.length === 0;
-    $('#archivedList').innerHTML = arch.map(row).join('');
-    $('#newTypeSwatches').innerHTML = swatchesHTML(ui.newColor, 'new');
-    renderStorage();
-  }
+  function renderSettings() { renderStorage(); }
 
   const agoText = ts => { const days = Math.floor((Date.now() - ts) / 864e5); return days <= 0 ? 'vandaag' : days === 1 ? 'gisteren' : `${days} dagen geleden`; };
   // Unsaved bookings from before today are the thing to worry about; today's are normal.
@@ -709,7 +737,13 @@ h2,h3{line-height:1.25}
       `<dt>Urenbestand</dt>${!fsaAvailable() ? (isIOS ? '<dd>Niet mogelijk op iPhone; gebruik Bewaar naar bestand</dd>' : '<dd>Niet mogelijk in deze browser; gebruik Bewaar naar bestand</dd>') : !fileHandle ? '<dd class="warn">Nog niet aangemaakt</dd>' : fileError ? `<dd class="warn">${esc(linkedName())}, schrijven mislukt</dd>` : `<dd>${esc(linkedName())}, bijgewerkt bij elke boeking</dd>`}` +
       `<dt>In bestand</dt>${unsavedCount() && !fileBusy ? `<dd class="warn">${plural(unsavedCount(), 'boeking', 'boekingen')} nog niet</dd>` : state.fileSavedAt ? '<dd>Alles</dd>' : `<dd${state.entries.length ? ' class="warn"' : ''}>Nog geen bestand</dd>`}` +
       `<dt>Laatste keer</dt><dd>${state.fileSavedAt ? agoText(state.fileSavedAt) : 'Nog geen'}</dd>` +
-      `<dt>Omvang</dt><dd>${plural(state.entries.length, 'boeking', 'boekingen')}, ${kb} kB</dd>`;
+      `<dt>Omvang</dt><dd>${plural(state.entries.length, 'boeking', 'boekingen')}, ${kb} kB</dd>` +
+      `<dt>Versie</dt><dd>${APP_VERSION}</dd>`;
+    $('#snapWrap').hidden = !storageInfo.idb;
+    $('#snapList').innerHTML = snapshots.map(s => {
+      const armed = ui.confirmSnap === s.key;
+      return `<li class="type-row"><span class="type-name">${esc(snapLabel(s))}</span><span class="type-total">${plural(s.count, 'boeking', 'boekingen')}</span><button type="button" class="ghost small${armed ? ' is-armed' : ''}" data-snap="${esc(s.key)}">${armed ? 'Ja, terugzetten' : 'Terugzetten'}</button></li>`;
+    }).join('') || '<li class="hint" style="padding:12px 4px">Nog geen kopieën.</li>';
     $('#fileActions').innerHTML = !fsaAvailable() ? '' : !fileHandle
       ? '<button type="button" class="primary small" style="flex:none" data-file-action="create">Bestand aanmaken</button><button type="button" class="ghost small" data-file-action="pick">Bestaand bestand kiezen</button>'
       : '<button type="button" class="ghost small" data-file-action="pick">Ander bestand koppelen</button><button type="button" class="ghost small" data-file-action="unlink">Loskoppelen</button>';
@@ -740,7 +774,7 @@ h2,h3{line-height:1.25}
       if (isIOS) body = 'Tik in Safari op Delen en kies “Zet op beginscherm”. Doe dit vóór je gaat boeken: de app op het beginscherm heeft eigen opslag.';
       else if (fsa) body = 'Installeer de app en maak daarna één keer het urenbestand aan op dit toestel. Dat bestand wordt bij elke boeking bijgewerkt en blijft staan als de app ooit verwijderd wordt.';
       else body = 'Installeer via het menu van de browser (App installeren).';
-      actions = (installPrompt ? '<button type="button" class="primary small" id="installBtn">Installeren</button>' : isIOS ? '' : '<button type="button" class="ghost small" data-goto="types">Hoe?</button>') +
+      actions = (installPrompt ? '<button type="button" class="primary small" id="installBtn">Installeren</button>' : isIOS ? '' : '<button type="button" class="ghost small" data-goto="settings">Hoe?</button>') +
         '<button type="button" class="linkbtn" data-banner-dismiss>Later</button>';
     } else if (fsa && !fileHandle) {
       title = 'Maak het urenbestand aan';
@@ -760,13 +794,13 @@ h2,h3{line-height:1.25}
     $('#bannerTitle').textContent = title; $('#bannerBody').textContent = body; $('#bannerActions').innerHTML = actions;
   }
 
-  function renderAll() { renderDay(); renderList(); renderTypes(); }
+  function renderAll() { renderDay(); renderList(); renderSettings(); }
 
   function setView(v) {
     ui.view = v;
     $$('.view').forEach(s => { s.hidden = s.id !== 'view-' + v; });
     $$('.tab').forEach(t => { const on = t.dataset.view === v; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); });
-    if (v === 'day') renderDay(); else if (v === 'list') renderList(); else renderTypes();
+    if (v === 'day') renderDay(); else if (v === 'list') renderList(); else renderSettings();
     window.scrollTo(0, 0);
   }
 
@@ -791,7 +825,7 @@ h2,h3{line-height:1.25}
     if (!d.typeId) { toast('Kies eerst een type.'); return; }
     if (ui.editingId) {
       const e = state.entries.find(x => x.id === ui.editingId);
-      if (e) { e.typeId = d.typeId; e.minutes = d.minutes; }
+      if (e) { e.typeId = d.typeId; e.minutes = d.minutes; e.updated = Date.now(); }
       ui.editingId = null; markChanged();
       save(); toast('Boeking opgeslagen');
     } else {
@@ -874,8 +908,10 @@ h2,h3{line-height:1.25}
     updateStripFade();
   }
   function updateStripFade() {
-    const strip = $('#typeChips'), wrap = $('#typeStrip');
-    wrap.classList.toggle('at-end', strip.scrollWidth - strip.clientWidth - strip.scrollLeft < 8);
+    for (const [c, w] of [['#typeChips', '#typeStrip'], ['#filterChips', '#filterStrip']]) {
+      const strip = $(c), wrap = $(w);
+      wrap.classList.toggle('at-end', strip.scrollWidth - strip.clientWidth - strip.scrollLeft < 8);
+    }
   }
   function syncDuration() {
     const m = ui.draft.minutes;
@@ -904,17 +940,6 @@ h2,h3{line-height:1.25}
     btn.addEventListener('contextmenu', e => e.preventDefault());
   }
 
-  function addType() {
-    const input = $('#newTypeName'), name = input.value.trim();
-    if (!name) { toast('Geef het type een naam.'); input.focus(); return; }
-    if (activeTypes().some(t => t.name.toLowerCase() === name.toLowerCase())) { toast('Dit type bestaat al.'); return; }
-    state.types.push({ id: uid(), name, color: ui.newColor, archived: false });
-    input.value = '';
-    ui.newColor = PALETTE[state.types.length % PALETTE.length];
-    if (!ui.draft.typeId) resetDraft();
-    save(); renderAll(); toast(`Type "${name}" toegevoegd`);
-  }
-
   function download(name, text, mime) {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name;
@@ -938,7 +963,7 @@ h2,h3{line-height:1.25}
     const rows = state.entries.filter(e => e.date >= from && e.date <= to && (all || ui.typeFilter.has(e.typeId)))
       .sort((a, b) => a.date.localeCompare(b.date) || a.created - b.created);
     const q = v => /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-    const lines = ['Datum;Type;Notitie;Minuten;Uren', ...rows.map(e => [e.date, (typeById(e.typeId) || UNKNOWN).name, e.note || '', e.minutes, fmtDec(e.minutes)].map(v => q(String(v))).join(';'))];
+    const lines = ['Datum;Type;Notitie;Minuten;Uren;Aangemaakt;Gewijzigd', ...rows.map(e => [e.date, (typeById(e.typeId) || UNKNOWN).name, e.note || '', e.minutes, fmtDec(e.minutes), fmtStamp(e.created), fmtStamp(e.updated)].map(v => q(String(v))).join(';'))];
     await shareOrDownload(`uren_${from}_${to}.csv`, '\uFEFF' + lines.join('\r\n'), 'text/csv;charset=utf-8');
   }
 
@@ -974,40 +999,16 @@ h2,h3{line-height:1.25}
     }
     if (d.period) { ui.period = d.period; return renderList(); }
     if (d.openDay) { ui.date = d.openDay; ui.editingId = null; resetDraft(); return setView('day'); }
-    if (d.editType) { const t = typeById(d.editType); if (!t) return; ui.editType = t.id; ui.editName = t.name; ui.editColor = t.color; return renderTypes(); }
-    if (d.swatch) { if (d.ctx === 'new') ui.newColor = d.swatch; else ui.editColor = d.swatch; return renderTypes(); }
-    if ('cancelType' in d) { ui.editType = null; return renderTypes(); }
-    if (d.saveType) {
-      const t = typeById(d.saveType); if (!t) return;
-      const name = $('#editTypeName').value.trim();
-      if (!name) { toast('Geef het type een naam.'); return; }
-      t.name = name; t.color = ui.editColor; ui.editType = null;
-      save(); renderAll(); return toast('Type opgeslagen');
+    if (d.snap) {
+      if (ui.confirmSnap !== d.snap) { ui.confirmSnap = d.snap; return renderSettings(); }
+      const s = snapshots.find(x => x.key === d.snap); ui.confirmSnap = null;
+      if (!s) return renderSettings();
+      return replaceState(s.data, 'snapshot').then(() => toast(`Kopie van ${snapLabel(s)} teruggezet`, 3500));
     }
-    if (d.archive || d.unarchive) {
-      const t = typeById(d.archive || d.unarchive); if (!t) return;
-      t.archived = !!d.archive; ui.editType = null;
-      if (t.archived && ui.draft.typeId === t.id && !ui.editingId) { ui.draft.typeId = null; resetDraft(); }
-      save(); renderAll(); return toast(t.archived ? 'Type gearchiveerd' : 'Type hersteld');
-    }
-    if (d.deleteType) {
-      if (state.entries.some(e => e.typeId === d.deleteType)) { toast('Dit type heeft nog boekingen.'); return; }
-      state.types = state.types.filter(t => t.id !== d.deleteType); ui.editType = null;
-      if (ui.draft.typeId === d.deleteType) { ui.draft.typeId = null; resetDraft(); }
-      save(); renderAll(); return toast('Type verwijderd');
-    }
-  });
-
-  document.addEventListener('input', ev => {
-    if (ev.target.id === 'editTypeName') ui.editName = ev.target.value;
-  });
-  document.addEventListener('keydown', ev => {
-    if (ev.key !== 'Enter') return;
-    if (ev.target.id === 'newTypeName') { ev.preventDefault(); addType(); }
-    if (ev.target.id === 'editTypeName') { ev.preventDefault(); const b = document.querySelector('[data-save-type]'); if (b) b.click(); }
   });
 
   $('#typeChips').addEventListener('scroll', updateStripFade, { passive: true });
+  $('#filterChips').addEventListener('scroll', updateStripFade, { passive: true });
   window.addEventListener('resize', updateStripFade);
   $('#prevDay').addEventListener('click', () => setDate(addDays(ui.date, -1)));
   $('#nextDay').addEventListener('click', () => setDate(addDays(ui.date, 1)));
@@ -1023,7 +1024,6 @@ h2,h3{line-height:1.25}
   $('#fromDate').addEventListener('change', ev => { ui.from = ev.target.value; renderList(); });
   $('#toDate').addEventListener('change', ev => { ui.to = ev.target.value; renderList(); });
   $('#exportCsv').addEventListener('click', exportCsv);
-  $('#addTypeBtn').addEventListener('click', addType);
   async function saveToFile() {
     const result = await shareOrDownload(fileName(), fileJson(), 'application/json');
     if (result === 'cancelled') return;
@@ -1033,18 +1033,18 @@ h2,h3{line-height:1.25}
   $('#dayNoticeBtn').addEventListener('click', ev => {
     const a = ev.currentTarget.dataset.action;
     if (a === 'file') saveToFile();
-    else { setView('types'); const b = $('#installBox'); if (b && !b.hidden) b.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); }
+    else { setView('settings'); const b = $('#installBox'); if (b && !b.hidden) b.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); }
   });
 
   // install prompt (Android/desktop Chrome and Edge fire this; iOS never does)
   let installPrompt = null;
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; renderBanner(); if (ui.view === 'types') renderTypes(); });
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; renderBanner(); if (ui.view === 'settings') renderSettings(); });
   window.addEventListener('appinstalled', () => { installPrompt = null; toast('Uren staat nu als app op je toestel'); ensurePersistent(true); renderAll(); });
   document.addEventListener('click', async ev => {
     if (!ev.target.closest('#installBtn') || !installPrompt) return;
     const p = installPrompt; installPrompt = null;
     try { p.prompt(); await p.userChoice; } catch (e) {}
-    renderTypes();
+    renderSettings();
   });
   if (window.matchMedia) { try { matchMedia('(display-mode: standalone)').addEventListener('change', renderAll); } catch (e) {} }
 
@@ -1057,19 +1057,13 @@ h2,h3{line-height:1.25}
       });
     }).catch(() => {});
   }
-  // Restoring a backup is an explicit choice: the file replaces what is on this device, whichever is
-  // newer. Device-bound fields (running timer, linked file, iOS notice) are kept, seed migrations run,
-  // and a linked file is rewritten so it matches again.
   $('#importJson').addEventListener('change', async ev => {
     const f = ev.target.files && ev.target.files[0]; if (!f) return;
     try {
       const s = JSON.parse(await f.text());
       if (!valid(s)) throw new Error('shape');
-      const { timer, linkedFileName, iosNoticeSeen } = state;
-      state = upgradeSeed({ version: 1, seedVersion: s.seedVersion, types: s.types, entries: s.entries, timer, linkedFileName, iosNoticeSeen });
-      ui.editingId = null; ui.editType = null; ui.typeFilter.clear(); ui.draft.typeId = null; resetDraft();
-      if (fileHandle) { markChanged(); save(); } else { markFileSaved(); persist(); }
-      renderAll(); toast('Bestand teruggezet');
+      await replaceState(s, 'file');
+      toast(`Bestand teruggezet, ${plural(state.entries.length, 'boeking', 'boekingen')}`, 3000);
     } catch (e) { toast('Dit bestand is geen geldige backup.'); }
     ev.target.value = '';
   });
@@ -1079,9 +1073,12 @@ h2,h3{line-height:1.25}
   resetDraft();
   renderAll();
   setView('day');
+  const splash = $('#splash');
+  if (reduced) splash.remove();
+  else setTimeout(() => { splash.classList.add('is-done'); setTimeout(() => splash.remove(), 350); }, 300);
   ensurePersistent(false);
-  restoreFromMirror().then(loadLinkedFile);
-  if (!storageInfo.local) toast('Let op: deze browser bewaart mogelijk niets. Maak een backup via Types.', 4000);
+  restoreFromMirror().then(loadLinkedFile).then(dailySnapshot);
+  if (!storageInfo.local) toast('Let op: deze browser bewaart mogelijk niets. Maak een backup via Instellingen.', 4000);
 })();
 </script>
 </body>

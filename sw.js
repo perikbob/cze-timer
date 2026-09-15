@@ -1,9 +1,9 @@
 // Uren – service worker. Bump VERSION when you change any of the ASSETS.
-const VERSION = 'uren-2026-09-15a';
+const VERSION = 'uren-2026-09-15c';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './fonts/InstrumentSans.woff2',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png',
+  './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png', './icons/logo.png',
 ];
 
 self.addEventListener('install', e => {

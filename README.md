@@ -5,7 +5,7 @@ Bestanden in deze map horen bij elkaar en moeten samen online staan:
 - `index.html` – de app
 - `manifest.webmanifest` – naam, icoon en weergave als app
 - `sw.js` – service worker voor offline gebruik
-- `fonts/`, `icons/` – lettertype en app-iconen (lokaal, geen externe verzoeken)
+- `fonts/`, `icons/` – lettertype, app-iconen en `logo.png` (lokaal, geen externe verzoeken)
 
 ## 1. Online zetten
 
@@ -21,7 +21,7 @@ Deel daarna het adres van `index.html`.
 ## 2. Installeren op de telefoon
 
 - **iPhone/iPad**: open het adres in Safari → Delen → *Zet op beginscherm*. Doe dit vóór je gaat boeken: de app op het beginscherm heeft eigen opslag, wat je in Safari boekt komt daar niet in (of: backup maken in Safari, terugzetten in de app).
-- **Android**: Chrome biedt *Installeren* / *Toevoegen aan startscherm* aan, of gebruik de knop onder Types → Gegevens en opslag.
+- **Android**: Chrome biedt *Installeren* / *Toevoegen aan startscherm* aan, of gebruik de knop onder Instellingen (tandwiel) → Gegevens en opslag.
 
 ## Boeken en timer
 
@@ -40,15 +40,23 @@ Deel daarna het adres van `index.html`.
 - Chrome kan bij de eerste boeking na het openen van de app één keer vragen of Uren het bestand mag bewerken; sta dat toe.
 - Het bestand staat buiten de app-opslag. Wordt de app verwijderd of komt er een nieuw toestel, dan kies je bij de eerste start **Bestaand bestand kiezen**, wijst `uren.json` aan en alles staat er weer.
 - Lukt het schrijven niet (bestand verwijderd, toestemming geweigerd), dan wordt de balk bovenaan rood met het aantal boekingen dat nog niet in het bestand staat, en een knop om het opnieuw te proberen of een ander bestand te koppelen. De uren zelf staan intussen gewoon in de app-opslag.
-- Onder Types → Gegevens en opslag zie je welk bestand gekoppeld is, en kun je een ander bestand koppelen of loskoppelen.
+- Onder Instellingen (tandwiel) → Gegevens en opslag zie je welk bestand gekoppeld is, en kun je een ander bestand koppelen of loskoppelen.
 
 ### iPhone
 
-Safari heeft deze mogelijkheid niet en Apple heeft aangegeven die niet te gaan bouwen. Op iPhone is **Bewaar naar bestand** (deelmenu → Bewaar in Bestanden) de weg naar een kopie buiten de app; de app telt hoeveel boekingen nog niet in een bestand staan en toont dat onder het boekpaneel. **Bestand terugzetten** leest zo'n bestand weer in.
+Safari heeft deze mogelijkheid niet en Apple heeft aangegeven die niet te gaan bouwen. Op iPhone is **Bewaar naar bestand** (deelmenu → Bewaar in Bestanden) de weg naar een kopie buiten de app; de app telt hoeveel boekingen nog niet in een bestand staan en toont dat onder het boekpaneel. Het bestand heet altijd `uren.json`: kies steeds dezelfde map (bijvoorbeeld OneDrive of iCloud Drive in Bestanden) en tik op *Vervangen* als iOS dat vraagt, dan is er één bestand dat altijd de laatste stand bevat. **Bestand terugzetten** leest zo'n bestand weer in.
+
+### Kopieën op het toestel
+
+Elke dag bij de eerste start, en vóór elk terugzetten, bewaart de app een kopie van de boekingen en types in IndexedDB, twee weken lang. Onder Instellingen (tandwiel) → Gegevens en opslag staan ze met een knop *Terugzetten*. Dit is een ongedaan-maken voor vergissingen (verkeerde bewerking, verkeerd bestand teruggezet), geen bescherming tegen verlies van het toestel.
+
+### Het bestand
+
+`uren.json` bevat de complete stand: `entries` (boekingen met `created` en, na bewerking, `updated` als tijdstempel), `types` (met `created`/`updated`), `savedAt`, en `exportedAt` plus de app-versie waarmee het is weggeschreven. De CSV-export bevat per boeking ook de kolommen *Aangemaakt* en *Gewijzigd*.
 
 ## 4. Nieuwe versie uitrollen
 
-Vervang `index.html` (en eventueel de andere bestanden). Wijzig je een bestand uit `fonts/` of `icons/`, verhoog dan `VERSION` in `sw.js`. Gebruikers zien *Nieuwe versie klaar* en krijgen de nieuwe versie bij de volgende start van de app.
+Vervang `index.html` (en eventueel de andere bestanden). Verhoog `APP_VERSION` in `index.html` (zichtbaar onder Gegevens en opslag en in het urenbestand) en `VERSION` in `sw.js`. Gebruikers zien *Nieuwe versie klaar* en krijgen de nieuwe versie bij de volgende start van de app.
 
 ## Beperkingen van deze PoC
 

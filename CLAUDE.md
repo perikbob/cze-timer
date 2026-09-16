@@ -40,9 +40,9 @@ Bumping `VERSION` in `sw.js` and `APP_VERSION` in `index.html` for every release
 Two objects:
 
 - `state` – persisted. Shape: `{ version, seedVersion, entries[], types[], savedAt, timer, linkedFileName, changesSinceFile, fileSavedAt, iosNoticeSeen }`.
-  - Entry: `{ id, date: 'YYYY-MM-DD', typeId, minutes, note, created, updated? }`. `created`/`updated` are epoch ms; `updated` is set on edit. Minutes created in the app are multiples of `STEP` (15), min 15, max `MAX_MIN` (24h); both the stepper (`setMinutes`) and the timer (`roundQuarter`) clamp. Entries from an imported backup are not validated per field, so do not assume the bounds hold for arbitrary data.
+  - Entry: `{ id, date: 'YYYY-MM-DD', typeId, minutes, note, created, updated? }`. `created`/`updated` are epoch ms; `updated` is set on edit. Minutes are whole numbers from `MIN_MIN` (1) to `MAX_MIN` (24h); `setMinutes` and the timer's `roundUp` clamp. The − / + buttons move one minute per tap (`STEP` = 1); a long press repeats every 200 ms and after ~8 repeats switches to `FAST_STEP` (5), snapping to the next multiple of 5 in that direction. Tapping the time opens a numeric input for exact minutes. Entries from an imported backup are not validated per field, so do not assume the bounds hold for arbitrary data.
   - Type: `{ id, name, color, archived, created?, updated? }`. Colors come from `PALETTE` (16 entries, one per default type). **Users cannot add, edit, archive or delete types**; the set is fixed in `DEFAULT_TYPES` and changed only through seed migrations. `archived` is still honoured when rendering for data that predates this.
-  - `timer`: `{ startedAt, typeId, date }` or null. Lives in `state` so it survives closing the app. Stopping rounds the elapsed time **up** to whole minutes and then **up** to the next quarter, min 0:15, capped at 24:00 (`roundQuarter`).
+  - `timer`: `{ startedAt, typeId, date }` or null. Lives in `state` so it survives closing the app. Stopping rounds the elapsed time **up** to the next whole minute, min 0:01, capped at 24:00 (`roundUp`).
 - `ui` – transient: current view, selected date, booking draft, edit mode, list filters, snapshot-restore arming, banner dismissal.
 
 **Default types and migrations.** `DEFAULT_TYPES` seeds a fresh install. `upgradeSeed()` runs on *every* path that loads stored data (localStorage, IDB mirror, linked file, backup import) and steps `seedVersion` forward: v2 swapped four early placeholder types, v3 added five types to existing installs (matched by name, archived counts as present, inserted before "Overig", user-made types untouched). To add or rename defaults again: append to `DEFAULT_TYPES`, bump `SEED_VERSION`, and add a `from < N` step to `upgradeSeed`. Never edit an existing step.
@@ -83,6 +83,6 @@ Conflict resolution between the local copies and the linked file is newest-wins 
 ### Product rules baked into the code
 
 - No default type: every booking requires an explicit type choice (`saveEntry` refuses without one, and the draft type resets after booking).
-- Durations only in 15-minute steps via presets 15/30/45/60 or the ± stepper (long-press repeats after 600 ms).
+- Durations: presets 15/30/45/60, the ± stepper per minute (long-press after 600 ms repeats and accelerates to 5-minute snaps), or a typed number of minutes via the tappable time (`openDurationInput`/`closeDurationInput`; Enter/blur applies, Escape cancels). Minimum 1 minute.
 - Deleting a **booking** is two-tap (arm, then confirm) via `ui.confirmDelete`; restoring a **snapshot** is two-tap via `ui.confirmSnap`. Armed buttons use the `.ghost.is-armed` style.
 - CSV export uses `;` separator, `\r\n`, BOM, decimal comma, matching Dutch Excel, with `Aangemaakt`/`Gewijzigd` timestamp columns at the end.

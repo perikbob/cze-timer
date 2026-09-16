@@ -121,7 +121,11 @@ h2,h3{line-height:1.25}
 .stepbtn{width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);font-size:26px;line-height:1;display:grid;place-items:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .stepbtn:hover:not(:disabled){background:var(--hover)}
 .stepbtn:disabled{opacity:.4}
-.duration{font-size:32px;font-weight:600;min-width:120px;text-align:center;letter-spacing:-.02em;line-height:1;user-select:none;-webkit-user-select:none}
+.duration{font-size:32px;font-weight:600;min-width:120px;padding:6px 10px;border-radius:10px;text-align:center;letter-spacing:-.02em;line-height:1;user-select:none;-webkit-user-select:none}
+.duration:hover{background:var(--surface)}
+.duration-in{width:120px;height:48px;padding:0;font-size:26px;font-weight:600;text-align:center;border-radius:10px;border:1px solid var(--accent);background:var(--surface);-moz-appearance:textfield}
+.duration-in::-webkit-outer-spin-button,.duration-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper-hint{margin:-4px 0 6px;text-align:center;font-size:13px;color:var(--ink2)}
 .text{width:100%;height:46px;padding:0 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface)}
 .text::placeholder{color:#948EA6}
 .actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
@@ -246,10 +250,12 @@ h2,h3{line-height:1.25}
       <div class="strip" id="typeStrip"><div class="chips" id="typeChips" role="radiogroup" aria-label="Type"></div></div>
       <div class="presets" id="presets" role="group" aria-label="Snelle tijd"></div>
       <div class="stepper">
-        <button type="button" class="stepbtn" id="minus" aria-label="15 minuten minder">−</button>
-        <div class="duration" id="durationOut" role="status" aria-live="polite">1:00</div>
-        <button type="button" class="stepbtn" id="plus" aria-label="15 minuten meer">+</button>
+        <button type="button" class="stepbtn" id="minus" aria-label="1 minuut minder">−</button>
+        <button type="button" class="duration" id="durationOut" aria-label="Tijd: 1:00. Tik om minuten te typen">1:00</button>
+        <input class="duration-in" id="durationIn" type="number" inputmode="numeric" min="1" max="1440" step="1" aria-label="Minuten" hidden>
+        <button type="button" class="stepbtn" id="plus" aria-label="1 minuut meer">+</button>
       </div>
+      <p class="stepper-hint">Houd − of + ingedrukt voor sneller, of tik op de tijd om minuten te typen</p>
       <div class="actions">
         <button type="button" class="primary" id="saveBtn">Boeken</button>
         <button type="button" class="ghost" id="cancelEdit" hidden>Annuleren</button>
@@ -319,9 +325,11 @@ h2,h3{line-height:1.25}
 <script>
 (() => {
   const KEY = 'uren-poc-v1';
-  const STEP = 15;
+  const STEP = 1;      // − / + step per tap
+  const FAST_STEP = 5; // step while holding the button longer than ~2 s; values then snap to multiples of 5
+  const MIN_MIN = 1;    // smallest booking
   const MAX_MIN = 24 * 60;
-  const APP_VERSION = '2.1';
+  const APP_VERSION = '2.2';
   const SNAP_DAYS = 14;
   const PALETTE = ['#0F6E5C','#2A8FA3','#2F6BB0','#6A5BC2','#9C4F9E','#B04B7E','#B0463E','#C8742A','#9C8420','#5E8B2F','#6E7F82','#8C5A2B','#5C6BC0','#00838F','#AD1457','#B58900'];
   const UNKNOWN = { name: 'Onbekend type', color: '#9AA7A9' };
@@ -829,7 +837,7 @@ h2,h3{line-height:1.25}
   let toastT;
   function toast(msg, ms = 2200) { const el = $('#toast'); el.textContent = msg; el.classList.add('is-visible'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('is-visible'), ms); }
 
-  function setDate(d) { if (!d) return; ui.date = d; ui.editingId = null; ui.confirmDelete = false; resetDraft(); renderDay(); }
+  function setDate(d) { if (!d) return; closeDurationInput(false); ui.date = d; ui.editingId = null; ui.confirmDelete = false; resetDraft(); renderDay(); }
 
   function startEdit(id) {
     const e = state.entries.find(x => x.id === id); if (!e) return;
@@ -870,9 +878,9 @@ h2,h3{line-height:1.25}
   const PRESETS = [15, 30, 45, 60];
   // ---------- timer ----------
   // One running timer, kept in state so it survives closing the app. Stop rounds the elapsed time up
-  // to whole minutes and then up to the next quarter (minimum 0:15, capped at 24:00). With a type
+  // to the next whole minute (20 seconds becomes 0:01; minimum 0:01, capped at 24:00). With a type
   // chosen it books at once; without, it fills in the duration and waits for a type.
-  const roundQuarter = ms => Math.min(MAX_MIN, Math.max(STEP, Math.ceil(Math.ceil(ms / 60000) / STEP) * STEP));
+  const roundUp = ms => Math.min(MAX_MIN, Math.max(MIN_MIN, Math.ceil(ms / 60000)));
   const fmtElapsed = ms => { const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60; return (h ? h + ':' + pad(m) : String(m)) + ':' + pad(s % 60); };
   let timerTick = null;
   function startTimer() {
@@ -882,7 +890,7 @@ h2,h3{line-height:1.25}
   }
   function stopTimer() {
     const t = state.timer; if (!t) return;
-    const minutes = roundQuarter(Date.now() - t.startedAt);
+    const minutes = roundUp(Date.now() - t.startedAt);
     const ty = t.typeId && typeById(t.typeId);
     state.timer = null;
     if (ty) {
@@ -901,7 +909,7 @@ h2,h3{line-height:1.25}
     const t = state.timer; if (!t) return;
     const ms = Date.now() - t.startedAt, ty = t.typeId && typeById(t.typeId);
     $('#timerTime').textContent = fmtElapsed(ms);
-    $('#timerSub').textContent = `wordt ${fmtMin(roundQuarter(ms))}, ${ty ? ty.name : 'kies nog een type'}`;
+    $('#timerSub').textContent = `wordt ${fmtMin(roundUp(ms))}, ${ty ? ty.name : 'kies nog een type'}`;
   }
   function renderTimer() {
     const running = !!state.timer, row = $('#timerRow'), btn = $('#recBtn');
@@ -936,14 +944,32 @@ h2,h3{line-height:1.25}
   }
   function syncDuration() {
     const m = ui.draft.minutes;
-    $('#durationOut').textContent = fmtMin(m);
-    $('#minus').disabled = m <= STEP;
+    const out = $('#durationOut');
+    out.textContent = fmtMin(m);
+    out.setAttribute('aria-label', `Tijd: ${fmtMin(m)}. Tik om minuten te typen`);
+    $('#minus').disabled = m <= MIN_MIN;
     $('#plus').disabled = m >= MAX_MIN;
     $('#presets').innerHTML = PRESETS.map(p =>
       `<button type="button" class="preset${m === p ? ' is-selected' : ''}" data-preset="${p}" aria-pressed="${m === p}">${p === 60 ? '1 uur' : p + ' min'}</button>`).join('');
   }
-  function setMinutes(m) { ui.draft.minutes = Math.min(MAX_MIN, Math.max(STEP, m)); syncDuration(); }
-  function step(dir) { setMinutes(ui.draft.minutes + dir * STEP); }
+  function setMinutes(m) { ui.draft.minutes = Math.min(MAX_MIN, Math.max(MIN_MIN, Math.round(m) || MIN_MIN)); syncDuration(); }
+  // A tap moves one minute. While holding, after the first repeats, size becomes FAST_STEP and the value
+  // moves to the next multiple of that size in the pressed direction (7 → 10 or 5).
+  function step(dir, size = STEP) {
+    const m = ui.draft.minutes;
+    setMinutes(dir > 0 ? Math.ceil((m + 1) / size) * size : Math.floor((m - 1) / size) * size);
+  }
+  // Tap the time to type minutes directly (1 to 1440). Enter or leaving the field applies, Escape cancels.
+  function openDurationInput() {
+    const inp = $('#durationIn'), out = $('#durationOut');
+    inp.value = ui.draft.minutes; out.hidden = true; inp.hidden = false; inp.focus(); inp.select();
+  }
+  function closeDurationInput(apply) {
+    const inp = $('#durationIn'), out = $('#durationOut');
+    if (inp.hidden) return;
+    if (apply && inp.value !== '') setMinutes(Number(inp.value));
+    inp.hidden = true; out.hidden = false;
+  }
   // Tap = one step. Only a long press (600 ms) starts repeating, and then calmly.
   function holdable(btn, dir) {
     let delay, repeat, held = false, reset;
@@ -954,7 +980,10 @@ h2,h3{line-height:1.25}
     btn.addEventListener('pointerdown', () => {
       if (btn.disabled) return;
       clearTimeout(reset); held = false;
-      delay = setTimeout(() => { held = true; step(dir); repeat = setInterval(() => step(dir), 250); }, 600);
+      delay = setTimeout(() => {
+        held = true; step(dir); let n = 0;
+        repeat = setInterval(() => step(dir, ++n < 8 ? STEP : FAST_STEP), 200);
+      }, 600);
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(n => btn.addEventListener(n, stop));
     btn.addEventListener('click', () => { if (held) { held = false; return; } step(dir); });
@@ -1038,6 +1067,12 @@ h2,h3{line-height:1.25}
   picker.addEventListener('change', () => setDate(picker.value));
   picker.addEventListener('click', ev => { if (typeof picker.showPicker === 'function') { ev.preventDefault(); try { picker.showPicker(); } catch (e) {} } });
   holdable($('#minus'), -1); holdable($('#plus'), 1);
+  $('#durationOut').addEventListener('click', openDurationInput);
+  $('#durationIn').addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') { ev.preventDefault(); closeDurationInput(true); }
+    else if (ev.key === 'Escape') { ev.preventDefault(); closeDurationInput(false); }
+  });
+  $('#durationIn').addEventListener('blur', () => closeDurationInput(true));
   $('#saveBtn').addEventListener('click', saveEntry);
   $('#recBtn').addEventListener('click', () => { if (state.timer) stopTimer(); else startTimer(); });
   $('#cancelEdit').addEventListener('click', cancelEdit);

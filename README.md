@@ -4,8 +4,8 @@ Uren is een kleine app voor je telefoon waarmee je bijhoudt hoeveel tijd je per 
 
 ## Wat kun je ermee
 
-- **Boeken.** Kies een type (bijvoorbeeld *Direct patiëntencontact* of *MDO patiëntenzorg*), kies een tijd via 15/30/45/60 of de knoppen − en +, en tik op *Boeken*. Tijd gaat in stappen van een kwartier.
-- **Timer.** Tik op de ronde knop bovenin het boekpaneel. Kies het type vooraf, tussendoor of bij het stoppen. Bij stoppen wordt de gelopen tijd naar boven afgerond op het volgende kwartier en direct geboekt. De timer loopt door als je de app sluit.
+- **Boeken.** Kies een type (bijvoorbeeld *Direct patiëntencontact* of *MDO patiëntenzorg*), kies een tijd via 15/30/45/60 of de knoppen − en + (per minuut; ingedrukt houden gaat sneller), of tik op de tijd om het aantal minuten te typen, en tik op *Boeken*. Minimaal 1 minuut.
+- **Timer.** Tik op de ronde knop bovenin het boekpaneel. Kies het type vooraf, tussendoor of bij het stoppen. Bij stoppen wordt de gelopen tijd naar boven afgerond op hele minuten (20 seconden wordt 1 minuut) en direct geboekt. De timer loopt door als je de app sluit.
 - **Terugkijken.** Blader per dag met de pijlen, of open *Lijst* voor 7, 30 of 90 dagen met totalen per type. Daar kun je ook een CSV-bestand voor Excel maken.
 - **Bewerken.** Tik op een boeking om de tijd of het type aan te passen, of om hem te verwijderen.
 - **Offline.** Na de eerste keer openen werkt de app ook zonder internet.
